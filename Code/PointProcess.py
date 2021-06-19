@@ -22,6 +22,8 @@ def PointProcessing(*args):
     channel_cnt = wave_header["ChannelCnt"].item()
     machine_type = wave_header["Reserved1"][0].item()
 
+    ref_sample_rate = RS.ReadSamplerate(machine_type)
+
     with open(args[0], "rb") as fid:
         fid.seek(head_size)
         data_info = np.fromfile(fid, np.uint16).tolist()
@@ -71,5 +73,13 @@ def PointProcessing(*args):
 
     start_ind = IndexSet(insp_mark_list, lambda x: x == 1)
     min_ind = IndexSet(exsp_mark_list, lambda x: x == 1)
+
+    for i in range(len(start_ind) - 1):
+        point_sta = start_ind[i]
+        point_end = start_ind[i + 1]
+        sumV = 0
+        for j in range(point_sta, point_end, 1):
+            sumV += (s_F[j] * 1000) / (60 * ref_sample_rate)
+            s_V.append(sumV)
 
     return [start_ind, min_ind, s_F, s_P, s_V]
