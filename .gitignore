@@ -1,0 +1,4 @@
+# ignore all file in .vscode/
+.vscode/
+# ignore all file .json
+*.json
