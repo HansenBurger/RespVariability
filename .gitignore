@@ -2,3 +2,5 @@
 .vscode/
 # ignore all file .json
 *.json
+# ignore bigfile
+DATA/Format/DATA.csv
