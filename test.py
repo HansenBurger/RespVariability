@@ -10,10 +10,10 @@ import numpy as np
 from matplotlib import pyplot as plt
 from Code import PointProcess as PP
 
-zdt_loc = r"Data\Heart_sample\ZU09BFB62105060253I_000.zdt"
-zpx_loc = r"Data\Heart_sample\ZU09BFB62105060253I_000.zpx"
+zdt_loc = r"Data\Sample\Heart\ZU09BFB62105060253I_000.zdt"
+zpx_loc = r"Data\Sample\Heart\ZU09BFB62105060253I_000.zpx"
 
-zdt = r"Data\Vent_sample\ZP0EBD1119121701RIA_223.zdt"
+zdt = r"Data\Sample\Resp\ZP0EBD1119121701RIA_223.zdt"
 
 para_info = BinImport.ImportPara(zpx_loc)[0]
 wave_header = BinImport.ImportWaveHeader(zdt_loc)[0]

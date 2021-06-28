@@ -5,7 +5,7 @@ from Code import PointProcess as PP
 
 np.warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
 
-zdt_loc = r"Data\Vent_sample\ZP0EBD1119121701RIA_223.zdt"
+zdt_loc = r"Data\Sample\Resp\ZP0EBD1119121701RIA_223.zdt"
 info_list = PP.PointProcessing(zdt_loc)
 
 wave_data = np.array([[0], [], []])
