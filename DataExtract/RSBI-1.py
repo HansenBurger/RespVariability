@@ -9,7 +9,7 @@ format_baguan_loc = r"Data\Format\vent_baguan.csv"
 def FormatProcess(df_loc, sort_jud):
     df_tmp = pd.read_csv(df_loc)
     df_tmp = df_tmp.dropna(axis=0, how="any", subset=["上机时间"])
-    df_tmp = df_tmp.sort_values(by=sort_jud, ascending=False)
+    df_tmp = df_tmp.sort_values(by=sort_jud, ascending=True)
     df_tmp = df_tmp.reset_index(drop=True)
 
     df_tmp[sort_jud] = df_tmp[sort_jud].astype("uint32")
@@ -63,6 +63,7 @@ for pid in df_baguan["patient_id"].unique():
 
     try:
         df_tmp_concat = gp_concat.get_group(pid)
+        df_tmp_concat = df_tmp_concat.sort_values(by = )
         df_tmp_baguan = gp_baguan.get_group(pid)
     except:
         pid_miss_index.append(pid)
@@ -79,8 +80,8 @@ for pid in df_baguan["patient_id"].unique():
             time_ = df_tmp_concat.loc[j, "record_time"]
             if time_ <= time_post and time_ > time_forw:
                 index_tmp_list.append(df_tmp_concat.loc[j, "Index"])
-            elif time_ > time_post:
-                break
+            # elif time_ > time_post:
+            #     break
 
         if not index_tmp_list:
             time_miss_index.append(df_tmp_baguan.loc[i, "Index"])
@@ -123,13 +124,20 @@ for i in rsbi_index_list:
 
     for j in rsbi_name:
 
+        tmp = []
+
         if j in rsbi_name[:9]:
-            rsbi_dict[j].append(concat_info[rsbi_map[j]])
+            tmp.append(concat_info[rsbi_map[j]].tolist())
+            rsbi_dict[j].extend(tmp[0])
 
         else:
-            tmp = []
             for x in range(copy_times):
                 tmp.append(baguan_info[rsbi_map[j]])
-            rsbi_dict[j].append(tmp)
+            rsbi_dict[j].extend(tmp)
 
-print(1)
+df_time_miss = df_baguan.loc[time_miss_index]
+df_time_miss = df_time_miss.drop(labels="Unnamed: 0", axis=1)
+df_rsbi = pd.DataFrame.from_dict(rsbi_dict)
+pd.DataFrame.to_csv(df_rsbi, r"Data\Result\rsbi_r.csv", index=False)
+pd.DataFrame.to_csv(df_time_miss, r"Data\Result\time_miss.csv", index=False)
+
