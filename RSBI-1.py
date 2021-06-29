@@ -1,35 +1,19 @@
+import os
 import pandas as pd
 from datetime import datetime, timedelta
 from copy import deepcopy
 
-format_concat_loc = r"Data\Format\DATA.csv"
-format_baguan_loc = r"Data\Format\vent_baguan.csv"
+# import sys
+# sys.path.insert(1, "")
 
+from Code import InIReaWri, FormPreProcess
 
-def FormatProcess(df_loc, sort_jud):
-    df_tmp = pd.read_csv(df_loc)
-    df_tmp = df_tmp.dropna(axis=0, how="any", subset=["上机时间"])
-    df_tmp = df_tmp.sort_values(by=sort_jud, ascending=True)
-    df_tmp = df_tmp.reset_index(drop=True)
+# format_concat_loc = r"Data\Format\DATA.csv"
+# format_baguan_loc = r"Data\Format\vent_baguan.csv"
 
-    df_tmp[sort_jud] = df_tmp[sort_jud].astype("uint32")
-    df_tmp["Index"] = df_tmp.index
-
-    return df_tmp
-
-
-def TimeShift(df_name, dt_format, column_names):
-    for i in df_name.columns:
-        if i in column_names:
-            index_num = 0
-            while pd.isna(df_name.loc[index_num, i]):
-                index_num = index_num + 1
-            else:
-                if len(str(df_name.loc[index_num, i]).split("-")) == 1:
-                    df_name[i] = pd.to_datetime(df_name[i], format=dt_format[0])
-                else:
-                    df_name[i] = pd.to_datetime(df_name[i], format=dt_format[1])
-
+form_concat_loc = InIReaWri.ConfigR("FormRoute", "MainDataForm", conf=None)
+form_baguan_loc = InIReaWri.ConfigR("FormRoute", "BaguanForm", conf=None)
+save_loc = InIReaWri.ConfigR("ResultRoute", "FormFolder", conf=None)
 
 timecol_names = [
     "入ICU时间",
@@ -50,11 +34,11 @@ pid_miss_index = []
 time_miss_index = []
 rsbi_index_list = []
 
-df_concat = FormatProcess(format_concat_loc, "patient_id")
-df_baguan = FormatProcess(format_baguan_loc, "patient_id")
+df_concat = FormPreProcess.FormProcess(form_concat_loc, "patient_id")
+df_baguan = FormPreProcess.FormProcess(form_baguan_loc, "patient_id")
 
-TimeShift(df_concat, datetime_format, timecol_names)
-TimeShift(df_baguan, datetime_format, timecol_names)
+FormPreProcess.TimeShift(df_concat, datetime_format, timecol_names)
+FormPreProcess.TimeShift(df_baguan, datetime_format, timecol_names)
 
 gp_concat = df_concat.groupby("patient_id")
 gp_baguan = df_baguan.groupby("patient_id")
@@ -63,8 +47,9 @@ for pid in df_baguan["patient_id"].unique():
 
     try:
         df_tmp_concat = gp_concat.get_group(pid)
-        df_tmp_concat = df_tmp_concat.sort_values(by = )
         df_tmp_baguan = gp_baguan.get_group(pid)
+        df_tmp_concat = df_tmp_concat.sort_values(by="record_time")
+        df_tmp_baguan = df_tmp_baguan.sort_values(by="拔管时间")
     except:
         pid_miss_index.append(pid)
         print(pid)
@@ -138,6 +123,9 @@ for i in rsbi_index_list:
 df_time_miss = df_baguan.loc[time_miss_index]
 df_time_miss = df_time_miss.drop(labels="Unnamed: 0", axis=1)
 df_rsbi = pd.DataFrame.from_dict(rsbi_dict)
-pd.DataFrame.to_csv(df_rsbi, r"Data\Result\rsbi_r.csv", index=False)
-pd.DataFrame.to_csv(df_time_miss, r"Data\Result\time_miss.csv", index=False)
 
+rsbi_save_route = os.path.join(save_loc, "rsbi_r.csv")
+time_miss_route = os.path.join(save_loc, "df_time_miss.csv")
+
+pd.DataFrame.to_csv(df_rsbi, rsbi_save_route, index=False)
+pd.DataFrame.to_csv(df_time_miss, time_miss_route, index=False)

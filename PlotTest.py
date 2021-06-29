@@ -1,11 +1,15 @@
 import numpy as np
 from copy import deepcopy
 from matplotlib import pyplot as plt
+
 from Code import PointProcess as PP
+from Code import InIReaWri
 
 np.warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
 
-zdt_loc = r"Data\Sample\Resp\ZP0EBD1119121701RIA_223.zdt"
+# zdt_loc = r"Data\Sample\Resp\ZP0EBD1119121701RIA_223.zdt"
+zdt_loc = InIReaWri.ConfigR("FileTestRoute", "WaveRead_zdt", conf=None)
+
 info_list = PP.PointProcessing(zdt_loc)
 
 wave_data = np.array([[0], [], []])
