@@ -29,4 +29,3 @@ def ConfigW(type, name, info, conf=None):
         conf[type][name] = info
     with open(config_path, "w") as configfile:
         conf.write(configfile)
-

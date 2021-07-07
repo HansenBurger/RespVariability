@@ -4,6 +4,7 @@ vent_machine_info = {
     "Drager": [3, 62.5, ["V300", "Evita", "Evita4", "xsV300", "xsEvita", "xsEvita4"]],
     "SV300_SV800": [4, 50, ["SV300", "SV800", "xsSV300", "xsSV800"]],
     "V60": [5, 50, ["V60", "xsV60"]],
+    "NoDefine": [7, 50, ["NoDefine"]],
     "V300": [8, 62.5, ["V300"]],
     "Vela": [11, 50, ["Vela", "xsVela"]],
     "Philips": [135, 128, ["Philips"]],

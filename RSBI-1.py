@@ -3,13 +3,7 @@ import pandas as pd
 from datetime import datetime, timedelta
 from copy import deepcopy
 
-# import sys
-# sys.path.insert(1, "")
-
 from Code import InIReaWri, FormPreProcess
-
-# format_concat_loc = r"Data\Format\DATA.csv"
-# format_baguan_loc = r"Data\Format\vent_baguan.csv"
 
 form_concat_loc = InIReaWri.ConfigR("FormRoute", "MainDataForm", conf=None)
 form_baguan_loc = InIReaWri.ConfigR("FormRoute", "BaguanForm", conf=None)

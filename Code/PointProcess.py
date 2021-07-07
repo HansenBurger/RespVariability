@@ -20,9 +20,11 @@ def PointProcessing(*args):
     wave_header = BI.ImportWaveHeader(args[0])[0]
     head_size = wave_header["HeaderSize"].item()
     channel_cnt = wave_header["ChannelCnt"].item()
-    machine_type = wave_header["Reserved1"][0].item()
+    ref_sample_rate = wave_header["RefSampleRate"].item()
 
-    ref_sample_rate = RS.ReadSamplerate(machine_type)
+    if ref_sample_rate == 0:
+        machine_type = wave_header["Reserved1"][0].item()
+        ref_sample_rate = RS.ReadSamplerate(machine_type)
 
     with open(args[0], "rb") as fid:
         fid.seek(head_size)
@@ -82,4 +84,4 @@ def PointProcessing(*args):
             sumV += (s_F[j] * 1000) / (60 * ref_sample_rate)
             s_V.append(sumV)
 
-    return [start_ind, min_ind, s_F, s_P, s_V]
+    return [start_ind, min_ind, s_F, s_P, s_V, ref_sample_rate]
