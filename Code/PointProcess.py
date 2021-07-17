@@ -7,7 +7,7 @@ def IndexSet(a, func):
     return [i for (i, val) in enumerate(a) if func(val)]
 
 
-def PointProcessing(*args):
+def PointProcessing(zdt_loc):
 
     resp_mark = {"insp_mark": True, "exsp_mark": False}
 
@@ -17,7 +17,7 @@ def PointProcessing(*args):
     insp_mark_list = []
     exsp_mark_list = []
 
-    wave_header = BI.ImportWaveHeader(args[0])[0]
+    wave_header = BI.ImportWaveHeader(zdt_loc)[0]
     head_size = wave_header["HeaderSize"].item()
     channel_cnt = wave_header["ChannelCnt"].item()
     ref_sample_rate = wave_header["RefSampleRate"].item()
@@ -26,7 +26,7 @@ def PointProcessing(*args):
         machine_type = wave_header["Reserved1"][0].item()
         ref_sample_rate = RS.ReadSamplerate(machine_type)
 
-    with open(args[0], "rb") as fid:
+    with open(zdt_loc, "rb") as fid:
         fid.seek(head_size)
         data_info = np.fromfile(fid, np.uint16).tolist()
         data_info = np.array(data_info)
@@ -43,7 +43,7 @@ def PointProcessing(*args):
     if channel_cnt == 2:
         F = wave_data[0]
         P = wave_data[1]
-        v = []
+        V = []
 
     elif channel_cnt == 3:
         F = wave_data[0]

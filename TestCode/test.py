@@ -1,42 +1,42 @@
-from configparser import NoOptionError
-from numpy.lib.function_base import percentile
-import sys, os
+import sys, pathlib
+from copy import deepcopy
 
-currentdir = os.path.dirname(os.path.realpath(__file__))
-parentdir = os.path.dirname(currentdir)
-print(currentdir)
-print(parentdir)
-# sys.path.append(parentdir)
+sys.path.append(str(pathlib.Path.cwd().parents[0]))
+from Code import InIReaWri, PointProcess
 
-# sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+zdt_sample = InIReaWri.ConfigR('FileTestRoute', 'WaveRead_zdt', conf=None)
 
-from pathlib import Path
-import pathlib
 
-current_loc = Path.cwd()
-print(current_loc)
-print(type(pathlib.Path.cwd().parents[0]))
-sys.path.append(str(current_loc.parents[0]))
+def ZeroJudge(list_):
+    list_ = list(map(lambda x: 0 if x < 0 else x, list_))
 
-from Code import InIReaWri
 
-a = InIReaWri.ConfigR('FormRoute', 'MainDataForm', conf=None)
-print(a)
+def FromkeysReid(dict_name):
+    dict_ = dict.fromkeys(dict_name)
+    for i in dict_name:
+        tmp = []
+        dict_[i] = deepcopy(tmp)
 
-# from Code.Fundal import BinImport_c
-# """
-#  BinImport_c test fail
-# """
-# from Code.Fundal import BinImport
-# from Code.Fundal import ReadSamplerate as RS
-# import numpy as np
-# from matplotlib import pyplot as plt
-# from Code import PointProcess as PP
+    return dict_
 
-# zdt_loc = r"Data\Sample\Heart\ZU09BFB62105060253I_000.zdt"
-# zpx_loc = r"Data\Sample\Heart\ZU09BFB62105060253I_000.zpx"
 
-# zdt = "ZG88310520080701GYH_006.zdt"
+vent_list = PointProcess.PointProcessing(zdt_sample)
+vent_name = ['p_s', 'p_e', 's_F', 's_P', 's_V', 'ref_samplerate']
+vent_dict = FromkeysReid(vent_name)
 
-# list_ = BinImport.ImportWaveHeader(zdt)
-# list_[1]
+for i in range(len(vent_list)):
+    vent_dict[vent_name[i]] = vent_list[i]
+
+ZeroJudge(vent_dict['s_V'])
+
+for i in range(len(vent_dict['p_s']) - 1):
+
+    start_point = vent_dict['p_s'][i]
+    end_point = vent_dict['p_s'][i + 1] - 1
+
+    wave_len = end_point - start_point
+
+    if wave_len == 0 or wave_len < 50 or wave_len > 450:
+        continue
+    else:
+        wave_data_f = vent_dict['s_F'][start_point, end_point]

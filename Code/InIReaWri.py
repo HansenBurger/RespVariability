@@ -1,6 +1,6 @@
 import configparser
 
-config_path = "config.ini"
+config_path = r"C:\Users\HY_Burger\Desktop\Project\RespVariability\config.ini"
 
 
 def DecoConf(func):
