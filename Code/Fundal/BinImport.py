@@ -1,5 +1,6 @@
 from copy import deepcopy
 import numpy as np
+import re
 
 wave_header_info = [
     ["HeaderMarker", 1, np.uint32],
@@ -161,15 +162,29 @@ vent_para_info = [
     ["fReserved", 40, np.uint32],  # Char
 ]
 
+record_info = {
+    'pid': [1, 'PID'],
+    'name': [1, 'NAME'],
+    'age': [1, 'AGE'],
+    'gender': [1, 'SEX'],
+    'remark': [1, 'REMARK'],  # Diseases
+    'dept': [1, 'DEPT'],  # Department
+    'rid': [1, 'RID'],
+    'machineType': [0, 'NAME'],
+    'bed': [1, 'BED'],
+    'time': [1, 'TIME']
+}
+
 
 def ImportWaveHeader(file_loc):
-
     """
     _Read the head info from bin file zdf_
     file_loc: the opt file location
     wave_header: return the info about zif file head
     data_engin: return the info about machine
     """
+
+    file_loc = str(file_loc)
 
     # Create name list wave data dict
 
@@ -198,14 +213,13 @@ def ImportWaveHeader(file_loc):
         with open(file_loc, "rb") as fid:
             for i in range(len(wave_header_info)):
                 wave_header[wave_header_info[i][0]] = np.fromfile(
-                    fid, wave_header_info[i][2], wave_header_info[i][1]
-                )
+                    fid, wave_header_info[i][2], wave_header_info[i][1])
 
             for i in range(1, 33):
                 for j in range(len(data_engine_info)):
                     data_engine[data_engine_info[j][0]].append(
-                        np.fromfile(fid, data_engine_info[j][2], data_engine_info[j][1])
-                    )
+                        np.fromfile(fid, data_engine_info[j][2],
+                                    data_engine_info[j][1]))
 
         # new_list = []
         # for i in data_engine["wcLabel"]:
@@ -216,7 +230,6 @@ def ImportWaveHeader(file_loc):
 
 
 def ImportPara(file_loc):
-
     """
     _Read the parament info from zpx file_
     file_loc: the opt file location
@@ -224,6 +237,7 @@ def ImportPara(file_loc):
     file_size: binary file size
     """
 
+    file_loc = str(file_loc)
     vent_para_name = []
 
     for i in vent_para_info:
@@ -243,7 +257,53 @@ def ImportPara(file_loc):
             for i in range(int(file_size / 1024)):
                 for j in range(len(vent_para_info)):
                     vent_para[vent_para_info[j][0]].append(
-                        np.fromfile(fid, vent_para_info[j][2], vent_para_info[j][1])
-                    )
+                        np.fromfile(fid, vent_para_info[j][2],
+                                    vent_para_info[j][1]))
 
     return vent_para, file_size
+
+
+def ImportZif(file_loc):
+    '''
+    _Read the main info from zif file_
+    file_loc: the opt file location
+    return_dict: the info we want from zif file
+    '''
+    patt = r"\"(.*)\" : \"(.*)\""
+    dict_num = 3
+    dict_list = []
+    return_dict = {}
+
+    with open(file_loc, 'rb') as fp:
+
+        dict_tmp = {}
+
+        while dict_num != 0:
+
+            try:
+                line = fp.readline().decode('gbk')  # transfer to string
+
+                if '}' in line:
+                    dict_list.append(dict_tmp)
+                    dict_num = dict_num - 1
+                    dict_tmp = {}
+                    continue
+
+                elif '{' not in line:
+                    list_ = list(re.findall(patt, line)[0])  # 0:key, 1:value
+                    key = list_[0]
+                    value = list_[1]
+
+                    if not value:
+                        value = None
+
+                    dict_tmp[key] = value
+
+            except:
+                continue  # keep scaning until find the effective line
+
+        record_name = list(record_info.keys())
+        for i in record_name:
+            return_dict[i] = dict_list[record_info[i][0]][record_info[i][1]]
+
+    return return_dict

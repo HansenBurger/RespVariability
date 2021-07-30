@@ -1,14 +1,16 @@
 from datetime import timedelta
 
 
-def TimeFilter(df_1,
-               df_2,
-               namelist=['patient_id', 'record_time', '拔管时间', 'Index']):
+def TimeFilter(df_1, df_2, namelist=['patient_id', '记录时间_1', '拔管时间', 'Index']):
     '''
     df_1: df_concat (DataFrame)
     df_2: df_baguan (DataFrame)
     namelist: Column names for operation dependencies (list)
     '''
+
+    #   拔管时间间隔
+    time_gap_hours = 2
+    time_gap_minutes = 10
 
     result_1 = []
     result_2 = []
@@ -23,8 +25,8 @@ def TimeFilter(df_1,
             df_tmp_gp1 = gp_1.get_group(pid)
             df_tmp_gp2 = gp_2.get_group(pid)
 
-            df_tmp_gp1 = df_tmp_gp1.sort_values(by=namelist[1])
-            df_tmp_gp2 = df_tmp_gp2.sort_values(by=namelist[2])
+            df_tmp_gp1 = df_tmp_gp1.sort_values(by=namelist[1], ascending=True)
+            df_tmp_gp2 = df_tmp_gp2.sort_values(by=namelist[2], ascending=True)
 
         except:
             result_1.append(pid)
@@ -33,18 +35,23 @@ def TimeFilter(df_1,
 
         for i in df_tmp_gp2.index:
 
-            time_post = df_tmp_gp2.loc[i, namelist[2]]
-            tim_forw = time_post - timedelta(hours=2)
             index_tmp_list = []
+
+            time_layer = df_tmp_gp2.loc[i, namelist[2]]
+            time_gap = timedelta(hours=time_gap_hours,
+                                 minutes=time_gap_minutes).seconds
 
             for j in df_tmp_gp1.index:
 
                 time_ = df_tmp_gp1.loc[j, namelist[1]]
 
-                if time_ <= time_post and time_ > tim_forw:
+                time_differ = (time_layer - time_).total_seconds()
+                # count the differ include date(not seconds)
+
+                if time_differ >= 0 and time_differ <= time_gap:
                     index_tmp_list.append(df_tmp_gp1.loc[j, namelist[3]])
 
-                elif time_ > time_post:
+                if time_ > time_layer:
                     break
 
             tmp = df_tmp_gp2.loc[i, namelist[3]]

@@ -2,15 +2,22 @@ import pandas as pd
 from pathlib import Path
 
 
-def FormPreProcess(df_loc, drop_jud=None, sort_jud=None, reset_jud=0):
+def FormPreProcess(df_loc,
+                   drop_jud=None,
+                   sort_jud=None,
+                   reset_jud=True,
+                   add_index=True):
     '''
     df_loc: location of csv (str)
     drop_jud: removal of invalid rows based on column names (list)
     sort_jud: sort the dataframe by column name (str, list)
     reset_jud: reset the index (default true)
+    add_index: add "Index" column at the end (default true)
     '''
 
     df_tmp = pd.read_csv(df_loc)
+    #   df_tmp = pd.read_csv(df_loc, index_col=0)
+    #   TODO:the index_col = 0 cause the astype error
 
     if drop_jud is not None:
         df_tmp = df_tmp.dropna(axis=0, how="any", subset=drop_jud)
@@ -22,10 +29,11 @@ def FormPreProcess(df_loc, drop_jud=None, sort_jud=None, reset_jud=0):
         except:
             print(sort_jud, ':unable to do type conversion')
 
-    if not reset_jud:
+    if reset_jud:
         df_tmp = df_tmp.reset_index(drop=True)
 
-    df_tmp["Index"] = df_tmp.index
+    if add_index:
+        df_tmp["Index"] = df_tmp.index
 
     return df_tmp
 

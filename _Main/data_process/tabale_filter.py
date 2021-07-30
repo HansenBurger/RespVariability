@@ -6,7 +6,7 @@ from Code import InIReaWri, FormProcess
 from Code.Fundal import basic
 
 form_concat_loc = InIReaWri.ConfigR("FormRoute", "MainDataForm", conf=None)
-form_baguan_loc = InIReaWri.ConfigR("FormRoute", "BaguanForm", conf=None)
+form_baguan_loc = InIReaWri.ConfigR("FormRoute", "BaguanForm_c", conf=None)
 save_loc = InIReaWri.ConfigR("ResultRoute", "FormFolder", conf=None)
 
 #-----Step1: filt-----
@@ -18,6 +18,7 @@ timecol_names = [
     "撤机",
     "record_time",
     "记录时间_1",
+    "记录时间_2",
     "插管时间",
     "拔管时间",
     "撤机时间",
@@ -41,9 +42,12 @@ concat_name_map = {
     "PID": "patient_id",
     "Record_t": "record_time",
     "Record_id": "record_id",
+    "ICU": "icu_name",
     "Resp_t": "记录时间_1",
+    "Resp_id": "RID_1",
     "zdt_1": "zdt_1",
     "zpx_1": "zpx_1",
+    "Heart_id": "RID_2",
     "Heart_t": "记录时间_2",
     "zdt_2": "zdt_2",
     "zpx_2": "zpx_2"
@@ -69,7 +73,7 @@ func.TableBuild2(time_miss_index, df_baguan, baguan_name_map, time_miss_dict)
 
 #-------Step3: save-------
 
-save_name_list = ['filted_r.csv', 'time_miss.csv']
+save_name_list = ['filted_r_4.csv', 'time_miss_4.csv']
 
 FormProcess.CsvToLocal(filted_save_dict, save_loc, save_name_list[0])
 FormProcess.CsvToLocal(time_miss_dict, save_loc, save_name_list[1])
