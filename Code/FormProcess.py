@@ -1,4 +1,5 @@
 import pandas as pd
+from datetime import datetime
 from pathlib import Path
 
 
@@ -16,8 +17,6 @@ def FormPreProcess(df_loc,
     '''
 
     df_tmp = pd.read_csv(df_loc)
-    #   df_tmp = pd.read_csv(df_loc, index_col=0)
-    #   TODO:the index_col = 0 cause the astype error
 
     if drop_jud is not None:
         df_tmp = df_tmp.dropna(axis=0, how="any", subset=drop_jud)
@@ -44,27 +43,18 @@ def TimeShift(df_name, column_names):
     column_names: column name of the type that needs to be changed (list)
     '''
 
-    date_format = {"/": "%Y/%m/%d %X", "-": "%Y-%m-%d %X"}
-    date_split = list(date_format.keys())
+    date_format = ['%Y/%m/%d %X', '%Y-%m-%d %X', '%Y-%m-%d %H:%M']
 
     for i in df_name.columns:
 
         if i in column_names:
 
-            index_num = 0
-
-            while pd.isna(df_name.loc[index_num, i]):
-                index_num = index_num + 1
-
-            judge_cell = str(df_name.loc[index_num, i])
-
-            for j in range(len(date_split)):
-                date_split_mark = date_split[j]
-                date_format_select = date_format[date_split_mark]
-
-                if len(judge_cell.split(date_split_mark)) > 1:
-                    df_name[i] = pd.to_datetime(df_name[i],
-                                                format=date_format_select)
+            for fmt in date_format:
+                try:
+                    df_name[i] = pd.to_datetime(df_name[i], format=fmt)
+                    break
+                except ValueError:
+                    pass
 
 
 def CsvToLocal(dict_, save_loc, save_name):

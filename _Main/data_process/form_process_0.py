@@ -1,6 +1,4 @@
 import sys, pathlib
-from numpy.core.numeric import NaN
-from numpy.lib.function_base import bartlett
 import pandas as pd
 
 sys.path.append(str(pathlib.Path.cwd().parents[1]))
@@ -31,5 +29,5 @@ df = df.loc[df_index_list]
 print('Form Length: ', df.shape[0])
 print('PID Length: ', len(df[col_name_list[0]].unique()))
 
-save_route = pathlib.Path(save_loc) / 'vent_baguan_c.csv'
+save_route = pathlib.Path(save_loc) / 'vent_baguan_c_.csv'
 pd.DataFrame.to_csv(df, save_route, index=False)

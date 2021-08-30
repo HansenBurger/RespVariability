@@ -7,7 +7,9 @@ from Code import InIReaWri
 #   Add Path
 
 save_loc = InIReaWri.ConfigR("ResultRoute", "FormFolder", conf=None)
-form_name_list = ["filted_r_4.csv", 'filted_c_4.csv', 'records_lack_4.csv']
+form_name_list = [
+    "filted_r_new.csv", 'filted_c_new.csv', 'records_lack_new.csv'
+]
 
 filted_form_loc = pathlib.Path(save_loc) / form_name_list[0]
 save_form_1_loc = pathlib.Path(save_loc) / form_name_list[1]

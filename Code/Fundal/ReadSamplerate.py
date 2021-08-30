@@ -149,9 +149,7 @@ def ReadVentMode(*args):
     machine_type = None
 
     for i in list(vent_info.keys()):
-        # if any(machine_name in s for s in vent_info[i]['NAME']):
         if StringListCheck(machine_name, vent_info[i]['NAME']):
-            #if machine_name in i['NAME']:
             vt_name = None if not vent_info[i]['VENT_TYPE'] else vent_info[i][
                 'VENT_TYPE'][vt_num]
             mt_name = None if not vent_info[i]['MAND_TYPE'] else vent_info[i][

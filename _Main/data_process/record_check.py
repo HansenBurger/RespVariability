@@ -15,10 +15,12 @@ data_folder = InIReaWri.ConfigR('SampleDataRoute', 'FiltedData', conf=None)
 save_loc = InIReaWri.ConfigR("ResultRoute", "FormFolder", conf=None)
 form_loc = pathlib.Path(
     InIReaWri.ConfigR('ResultRoute', 'FormFolder',
-                      conf=None)) / 'filted_c_4.csv'
+                      conf=None)) / 'filted_c_new.csv'
+form_test_loc = r'C:\Users\HY_Burger\Desktop\Project\RespVariability\test.csv'
 #   Form Process
 
 time_columns = ['Record_t', 'Resp_t', 'Heart_t', 'endo_t', 'SBT_time']
+time_column = ['Record_t', 'Resp_t', 'endo_t']
 #   time_columns = ['Record_t', 'Resp_t', 'endo_t']
 df = FormProcess.FormPreProcess(form_loc, add_index=False)
 FormProcess.TimeShift(df, time_columns)
@@ -85,12 +87,12 @@ for i in df.index:
           str(i + 1).rjust(4, '0'), ' row consume ', time_scamp, ' s')
 
 print('total consuming time during process: ', total_t)
-a = 1
 
 df['machine'] = vent_machine_list
 df['vent_m'] = vent_mode_name_list
 df['vent_t'] = vent_still_time_list
-save_route_1 = pathlib.Path(save_loc) / 'machinetype_4.csv'
+save_route_1 = pathlib.Path(save_loc) / 'machinetype_new.csv'
+save_route_2 = 'test_result.csv'
 # save_route_2 = pathlib.Path(save_loc) / 'machinetype_lack.csv'
 pd.DataFrame.to_csv(df, save_route_1, index=False)
 # pd.DataFrame.to_csv(df_lack, save_route_2, index=False)

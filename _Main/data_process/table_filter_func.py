@@ -15,6 +15,7 @@ def TimeFilter(df_1, df_2, namelist=['patient_id', '记录时间_1', '拔管时�
     result_1 = []
     result_2 = []
     result_3 = []
+    result_4 = []
 
     gp_1 = df_1.groupby(namelist[0])
     gp_2 = df_2.groupby(namelist[0])
@@ -49,9 +50,19 @@ def TimeFilter(df_1, df_2, namelist=['patient_id', '记录时间_1', '拔管时�
                 # count the differ include date(not seconds)
 
                 if time_differ >= 0 and time_differ <= time_gap:
-                    index_tmp_list.append(df_tmp_gp1.loc[j, namelist[3]])
+                    loc = df_tmp_gp1.loc[j, namelist[3]]
+                    index_tmp_list.append(loc)
+                    # if j + 1 <= df_tmp_gp1.index.max():
+                    #     time_gap_post = (df_tmp_gp1.loc[j + 1, namelist[1]] -
+                    #                  time_layer).total_seconds()
+                    # else:
+                    #     time_gap_post = None
+                    # result_4.append(time_gap_post)
 
                 if time_ > time_layer:
+                    if index_tmp_list != []:
+                        result_4.append([(time_ - time_layer).total_seconds(),
+                                         i])
                     break
 
             tmp = df_tmp_gp2.loc[i, namelist[3]]
@@ -63,7 +74,7 @@ def TimeFilter(df_1, df_2, namelist=['patient_id', '记录时间_1', '拔管时�
                 index_tmp_list.append(tmp)
                 result_3.append(index_tmp_list)
 
-    return result_1, result_2, result_3
+    return result_1, result_2, result_3, result_4
 
 
 def TableBuild1(*args):
