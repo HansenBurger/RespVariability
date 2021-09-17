@@ -10,7 +10,7 @@ def DecoConf(func):
             conf.read(config_path)
             return func(type, name, conf)
         except:
-            print("config path error")
+            print(type + " " + name + " " + "config path error")
 
     return Wrapper
 

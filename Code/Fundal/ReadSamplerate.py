@@ -100,7 +100,7 @@ def StringListCheck(string, list_):
     return False
 
 
-def ReadSamplerate(num_machine_type, str_machine_type=None):
+def ReadSamplerate(num_machine_type=None, str_machine_type=None):
     """
     num_machine_type: the machine ID from wave header
     str_machine_type: default none
@@ -146,7 +146,7 @@ def ReadVentMode(*args):
     mt_name = None
     vm_name = None
 
-    machine_type = None
+    machine_type = 'NaN'
 
     for i in list(vent_info.keys()):
         if StringListCheck(machine_name, vent_info[i]['NAME']):
@@ -154,10 +154,11 @@ def ReadVentMode(*args):
                 'VENT_TYPE'][vt_num]
             mt_name = None if not vent_info[i]['MAND_TYPE'] else vent_info[i][
                 'MAND_TYPE'][mt_num]
-            vm_name = vent_info[i]['VENT_MODE'][vm_num]
+            vm_name = vent_info[i]['VENT_MODE'][vm_num] if vm_num < len(
+                vent_info[i]['VENT_MODE']) else str(vm_num)
 
     if not vm_name:
-        machine_type = None
+        machine_type = 'NaN'
     else:
         if not mt_name:
             machine_type = vm_name

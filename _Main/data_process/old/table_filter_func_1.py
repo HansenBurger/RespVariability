@@ -1,21 +1,6 @@
 from datetime import timedelta
 
 
-def LocatIndex(df, col, value):
-    '''
-    df: dataframe to be search
-    col: df column name to seach (string, list)
-    value: the locat value
-    '''
-    index_list = []
-    gp = df.groupby(col)
-    df_tmp = gp.get_group(value)
-    for i in df_tmp.index:
-        index_list.append(i)
-
-    return index_list
-
-
 def TimeFilter(df_1, df_2, namelist=['patient_id', 'PID', '记录时间_1', 'ExTime']):
     '''
     df_1: df_concat (DataFrame)
@@ -40,13 +25,13 @@ def TimeFilter(df_1, df_2, namelist=['patient_id', 'PID', '记录时间_1', 'ExT
             df_tmp_gp1 = gp_1.get_group(pid)
             df_tmp_gp2 = gp_2.get_group(pid)
 
-            df_tmp_gp1 = df_tmp_gp1.sort_values(by=namelist[2], ascending=True)
-            df_tmp_gp2 = df_tmp_gp2.sort_values(by=namelist[3], ascending=True)
-
         except:
             result_1.append(LocatIndex(df_2, namelist[1], pid)[0])
             print('pid missing: ', pid)
             continue
+
+        df_tmp_gp1 = df_tmp_gp1.sort_values(by=namelist[2], ascending=True)
+        df_tmp_gp2 = df_tmp_gp2.sort_values(by=namelist[3], ascending=True)
 
         for i in df_tmp_gp2.index:
 

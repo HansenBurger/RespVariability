@@ -5,17 +5,18 @@ sys.path.append(str(pathlib.Path.cwd().parents[1]))
 from Code import InIReaWri, FormProcess
 from Code.Fundal import basic
 
-form_concat_loc = InIReaWri.ConfigR("FormRoute", "MainDataForm", conf=None)
-form_baguan_loc = InIReaWri.ConfigR("FormRoute", "BaguanForm", conf=None)
-save_loc = InIReaWri.ConfigR("ResultRoute", "FormFolder", conf=None)
+form_concat_loc = InIReaWri.ConfigR('FormRoute', 'MainDataForm', conf=None)
+form_baguan_loc = InIReaWri.ConfigR('FormRoute', 'BaguanForm', conf=None)
+form_record_loc = InIReaWri.ConfigR('FormRoute', 'RecordParaInfo', conf=None)
+save_loc = InIReaWri.ConfigR('ResultRoute', 'FormFolder_new', conf=None)
 
-#-----Step1: filt-----
+#-----Step0: generate-----
 
-timecol_form1 = [
+timecol_format1 = [
     '入ICU时间', '出ICU时间', '上机时间', '撤机', 'record_time', '记录时间_1', '记录时间_2'
 ]
 
-timecol_form2 = [
+timecol_format2 = [
     'FirstMVTime', 'SBTTime', 'ExTime', 'WeanTime', 'BackOnTime', 'ICUInTime',
     'ICUOutTime', 'HPInTime', 'HPOutTime'
 ]
@@ -26,9 +27,14 @@ df_concat = FormProcess.FormPreProcess(form_concat_loc, ['上机时间'],
 df_baguan = FormProcess.FormPreProcess(form_baguan_loc,
                                        sort_jud='PID',
                                        add_index=False)
+df_record_para = FormProcess.FormPreProcess(form_record_loc,
+                                            sort_jud='PID',
+                                            add_index=False)
 
-FormProcess.TimeShift(df_concat, timecol_form1)
-FormProcess.TimeShift(df_baguan, timecol_form2)
+FormProcess.TimeShift(df_concat, timecol_format1)
+FormProcess.TimeShift(df_baguan, timecol_format2)
+
+#-----Step1: filt-----
 
 result_ = func.TimeFilter(df_concat, df_baguan)
 pid_miss_index = result_[0]

@@ -12,7 +12,7 @@ zpx_path = pathlib.Path(
     main_loc) / folder_list[5] / 'ZG88310520081000RC6_001.zpx'
 
 zif_output = BinImport.ImportZif(zif_path)
-zdt_output = BinImport.ImportWaveHeader(zdt_path)
+#zdt_output = BinImport.ImportWaveHeader(zdt_path)
 zpx_output = BinImport.ImportPara(zpx_path)
 
 machine_name = zif_output['machineType'].split('-')[0]

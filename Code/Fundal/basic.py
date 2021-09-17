@@ -1,4 +1,6 @@
 from copy import deepcopy
+from functools import wraps
+from time import time
 
 
 def FromkeysReid(dict_name):
@@ -12,3 +14,17 @@ def FromkeysReid(dict_name):
         dict_[i] = deepcopy(tmp)
 
     return dict_
+
+
+def measure(func):
+    @wraps(func)
+    def _time_it(*args, **kwargs):
+        print(func.__name__, 'starts running...')
+        start = int(round(time() * 1000))
+        try:
+            return func(*args, **kwargs)
+        finally:
+            end_ = int(round(time() * 1000)) - start
+            print(f"Total execution time: {end_ if end_ > 0 else 0} ms\n")
+
+    return _time_it
