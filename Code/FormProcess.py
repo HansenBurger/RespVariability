@@ -61,10 +61,10 @@ def TimeShift(df, column_names):
                     df[i] = pd.to_datetime(df[i], format=fmt)
                     break
                 except ValueError:
-                    print(
-                        'The "{0}" of table cannot find the corresponding time format'
-                        .format(i))
-                    pass
+                    if fmt == date_format[-1]:
+                        print(
+                            'The "{0}" of table cannot find "ANY" corresponding time format'
+                            .format(i))
 
 
 def CsvToLocal(table, save_loc, save_name):

@@ -1,6 +1,7 @@
 import sys, pathlib, datetime
 import pandas as pd
 import numpy as np
+import record_class_func as func
 
 sys.path.append(str(pathlib.Path.cwd().parents[1]))
 from Code import InIReaWri, FormProcess, PointProcess
@@ -17,7 +18,7 @@ vent_mode_1 = []
 
 data_folder = InIReaWri.ConfigR('SampleDataRoute', 'FiltedData', conf=None)
 save_loc = InIReaWri.ConfigR("ResultRoute", "FormFolder_new", conf=None)
-form_loc = pathlib.Path(save_loc) / 'filted_c.csv'
+form_loc = pathlib.Path(save_loc) / 'table_filted_c.csv'
 form_test_loc = r'C:\Users\HY_Burger\Desktop\Project\RespVariability\test.csv'
 #   Form Process
 time_columns = ['Resp_t', 'end_time', 'Heart_t', 'endo_t', 'SBT_time']
@@ -98,7 +99,7 @@ for i in df.index:
             vent_mode_j = ReadSamplerate.ReadVentMode(
                 vent_machine, para_outputs['st_VENT_TYPE'][j].item(),
                 para_outputs['st_VENT_MODE'][j].item(),
-                para_outputs['st_VENT_TYPE'][j].item())
+                para_outputs['st_MAND_TYPE'][j].item())
             vent_mode_name.append(vent_mode_j)
 
     else:

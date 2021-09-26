@@ -106,7 +106,7 @@ def ReadSamplerate(num_machine_type=None, str_machine_type=None):
     str_machine_type: default none
     """
 
-    if num_machine_type != None:
+    if num_machine_type and type(num_machine_type) == int:
 
         for i in vent_machine_info.values():
 
@@ -116,7 +116,8 @@ def ReadSamplerate(num_machine_type=None, str_machine_type=None):
 
         print("1 - no matching types")
 
-    elif num_machine_type == None and str_machine_type != None:
+    elif str_machine_type and not num_machine_type and type(
+            str_machine_type) == str:
 
         try:
             type_name = str_machine_type.split("-")[0]
@@ -166,7 +167,3 @@ def ReadVentMode(*args):
             machine_type = vm_name + '/' + mt_name
 
     return machine_type
-
-
-def SBTjudge(m_type, ):
-    pass

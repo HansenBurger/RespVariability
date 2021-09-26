@@ -3,6 +3,25 @@ class Domain:
         pass
 
 
+# 定位的类
+class FileLocData(Domain):
+    def __init__(self):
+        super().__init__()
+        self.__rid = ''
+        self.__month = ''
+        self.__zif_loc = ''
+        self.__zdt_loc = ''
+        self.__zpx_loc = ''
+
+    @property
+    def rid(self):
+        return self.__rid
+
+    @rid.setter
+    def rid(self, rid):
+        self.__rid = rid
+
+
 class Domain1(Domain):
     def __init__(self):
         super().__init__()
@@ -107,29 +126,29 @@ class DomainAgger(Domain):
         return self.__RR
 
     @RR.setter
-    def RR(self, v):
-        self.__RR = v
+    def RR(self, rid):
+        self.__RR = rid
 
     @property
     def MV(self):
         return self.__MV
 
     @MV.setter
-    def MV(self, v):
-        self.__MV = v
+    def MV(self, rid):
+        self.__MV = rid
 
     @property
     def tidal(self):
         return self.__tidal
 
     @tidal.setter
-    def tidal(self, v):
-        self.__tidal = v
+    def tidal(self, rid):
+        self.__tidal = rid
 
     @property
     def min_vent(self):
         return self.__min_vent
 
     @min_vent.setter
-    def min_vent(self, v):
-        self.__min_vent = v
+    def min_vent(self, rid):
+        self.__min_vent = rid

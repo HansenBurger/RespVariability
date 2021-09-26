@@ -7,7 +7,7 @@ from Code import InIReaWri, FormProcess
 from Code.Fundal import basic
 
 static = data.DataStatic()
-dynamic = data.DataDynamic()  # life cycle ?
+dynamic = data.DataDynamic()
 
 
 def SaveLocGenerate():
@@ -108,7 +108,7 @@ def TableSave():
 def TableProcess():
     func_process = func.TableProcess(dynamic.filt_df, static.col_name)
 
-    func_process.ValidProcess()
+    func_process.ValidProcess()  # Save to config.ini
     FormProcess.PrintTableInfor(func_process.df, 'PID')
     FormProcess.CsvToLocal(func_process.df, dynamic.save_loc,
                            static.save_table_name['table valid'])

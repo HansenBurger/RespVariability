@@ -21,18 +21,3 @@ def Rename_hicc_nhen(f_path, capital=''):
                      (capital + q.stem.rjust(digits, '0') + '.jpg'))
         else:
             q.rename(q.parents[0] / (capital + q.stem + '.jpg'))
-
-
-# dict_ = {'a': [], 'b': [], 'c': []}
-# i = 0
-# while i != 10:
-#     dict_['a'].append(1)
-#     dict_['b'].append(2)
-#     dict_['c'].append(3)
-#     i = i + 1
-
-# print(1)
-
-list_ = [11, 12]
-list_ = list_ * 4
-print(list_)

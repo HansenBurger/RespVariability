@@ -8,6 +8,7 @@ from Code import InIReaWri, FormProcess
 form_loc = InIReaWri.ConfigR('FormRoute', 'ModeForm', conf=None)
 save_form_loc = InIReaWri.ConfigR('ResultRoute', 'FormFolder_new', conf=None)
 save_graph_loc = InIReaWri.ConfigR('ResultRoute', 'GraphFolder', conf=None)
+# 两个保存路径，一个maintable 一个savetable，加一个process后的表 俩保存名
 
 time_col = ['Resp_t', 'end_time', 'Heart_t', 'endo_t', 'SBT_time']
 df = FormProcess.FormPreProcess(form_loc, sort_jud=['PID', 'Resp_t'])
@@ -83,6 +84,8 @@ for pid in pid_list:
 
 max_ventm_time = len(max(save_dict['vent_m'], key=len))
 time_gap_name_list = BuildListbyRange(max_ventm_time)
+
+# 补全
 
 for i in range(len(save_dict['vent_m'])):
     save_dict['vent_m'][i] += [''] * (max_ventm_time -
