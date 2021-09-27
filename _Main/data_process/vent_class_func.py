@@ -90,25 +90,33 @@ class TableQuery(FuncBasic):
         super().__init__()
         self.__df1 = df_1
         self.__df2 = df_2
-        self.df = None
         self.__index = []
+        self.df = None
 
     def __PSVFilter(self, series):
         mode = ['CPAP', 'SPONT']
         filt = series.str.contains(mode[0]) | series.str.contains(mode[1])
         return filt
 
-    def __ColnameGenerate(self, v_list):
-        pass
+    def __ColnameGenerater(self, v):
+        info = ['mode', 'min']
+        colname = []
+        for i in range(int(v / 30) + 1):
+            colname.append('_'.join(
+                [info[0], str(i * 30).rjust(3, '0'), info[1]]))
+        return colname
 
-    def TableFilt(self, colname_list):
+    def __TableFilt_1h(self):
+
+        colname_list = self.__ColnameGenerater(60)
         filt_0 = self.__PSVFilter(self.__df2[colname_list[0]])
         filt_1 = self.__PSVFilter(self.__df2[colname_list[1]])
         filt_2 = self.__PSVFilter(self.__df2[colname_list[2]])
         self.__df2 = self.__df2.loc[filt_0 & filt_1 & filt_2]
-        pass
 
     def ConcatQuery(self, colname_list):
+
+        self.__TableFilt_1h()
 
         gp_1 = pd.DataFrame.groupby(self.__df1, colname_list[0])
         gp_2 = pd.DataFrame.groupby(self.__df2, colname_list[0])
@@ -128,6 +136,5 @@ class TableQuery(FuncBasic):
 
         del gp_1, gp_2
 
-        self.df = self.__df1.iloc[self.__index]
+        self.df = self.__df1.iloc[self.__index]  #assignment creats new address
         self.df = self.df.reset_index(drop=True)
-        pass

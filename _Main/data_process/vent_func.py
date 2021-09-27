@@ -119,7 +119,7 @@ def GenerateObjList_pid():
 def TableBuild():
 
     colname = static.table_col_map
-    df = dynamic.df_new  # 内存传递？
+    df = dynamic.df_new
 
     print(dynamic.df_new.shape)
 
@@ -146,20 +146,12 @@ def TableProcess_1h():
 
     colname = static.table_col_map
     df_record = dynamic.df_main
-    df_vent = dynamic.df_new  #内存传递？
-
-    print(id(dynamic.df_main))
-    print(id(df_record))
+    df_vent = dynamic.df_new
 
     process = func.TableQuery(df_record, df_vent)
-    process.TableFilt(['mode_000_min', 'mode_030_min', 'mode_060_min'])
     process.ConcatQuery([
-        colname['patient ID'],
-        colname['record time'],
-        colname['exTube time'],
+        colname['patient ID'], colname['record time'], colname['exTube time']
     ])
-
-    print(dynamic.df_main.shape)
 
     FormProcess.CsvToLocal(process.df, dynamic.save_form_loc,
                            static.save_table_name['table result 2'])

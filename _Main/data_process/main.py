@@ -51,7 +51,18 @@ def DataChecker():
     func_2.TableBuild()
 
 
-def main():
+def ModeProcessor():
+    '''
+    ---- ModeProcessor ----
+        Description: Check the ventilation pattern of the PID in chronological order
+        Main Form: record_chek.csv
+        Result Form: records_pro_1h_ExTube.csv
+        Workflow:
+            1. Save table basic information to the object list after sorting by PID
+            2. Correction of the exTube time for each obj and re-saving of the obj's information
+            3. Generate objlist ( attributes: necessary colnames for the new table )
+            4. Save output to table and store
+    '''
     func_3.SaveLocGenerate()
     func_3.MainTableBuild()
     func_3.GenerateObjList_gp()
@@ -59,6 +70,13 @@ def main():
     func_3.GenerateObjList_pid()
     func_3.TableBuild()
     func_3.TableProcess_1h()
+
+
+def main():
+    print('I am the storm that is approooooaching !')
+    TableFilter
+    DataChecker
+    ModeProcessor
 
 
 if __name__ == '__main__':
