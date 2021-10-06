@@ -9,7 +9,7 @@ def IndexSet(a, func):
 
 def PointProcessing(zdt_loc):
 
-    resp_mark = {"insp_mark": True, "exsp_mark": False}
+    resp_mark = {"insp_mark": False, "exsp_mark": False}
 
     s_F = []
     s_P = []
@@ -73,6 +73,7 @@ def PointProcessing(zdt_loc):
                 insp_mark_list.append(0)
                 exsp_mark_list.append(0)
 
+    s_V = [0] * len(s_P)
     start_ind = IndexSet(insp_mark_list, lambda x: x == 1)
     min_ind = IndexSet(exsp_mark_list, lambda x: x == 1)
 
@@ -82,6 +83,36 @@ def PointProcessing(zdt_loc):
         sumV = 0
         for j in range(point_sta, point_end, 1):
             sumV += (s_F[j] * 1000) / (60 * ref_sample_rate)
-            s_V.append(sumV)
+            s_V[j] = sumV
+
+    # if not start_ind:
+    #     return [start_ind, min_ind, s_F, s_P, s_V, ref_sample_rate]
+
+    # j = 0
+    # for k in range(len(s_P)):
+
+    #     if j == len(start_ind) - 1:
+    #         s_V.append(0)
+
+    #     else:
+    #         p_star = start_ind[j]
+    #         p_end = start_ind[j + 1]
+
+    #         if k < p_star:
+    #             s_V.append(0)
+
+    #         elif k == p_star:
+    #             sumV = (s_F[k] * 1000) / (60 * ref_sample_rate)
+    #             s_V.append(sumV)
+
+    #         elif k > p_star and k < p_end:
+    #             sumV += (s_F[k] * 1000) / (60 * ref_sample_rate)
+    #             s_V.append(sumV)
+
+    #         elif k == p_end:
+    #             s_V.append(0)
+    #             j += 1
+
+    s_V = [0 if x < 0 else x for x in s_V]
 
     return [start_ind, min_ind, s_F, s_P, s_V, ref_sample_rate]

@@ -1,0 +1,2 @@
+PID,ICU,Record_id,Resp_t,end_time,Resp_id,zdt_1,zpx_1,Heart_id,Heart_t,zdt_2,zpx_2,endo_t,endo_end,SBT_info,SBT_time,SBT_type,machine,vent_m_0,vent_m_1,vent_m_2,vent_t
+3644655,xsICU3F,ZD883B4120052001IAF,2020-05-25 09:00:02,2020-06-28 12:00:00,ZD883B4120052001IAF,ZD883B4120052001IAF_111,ZD883B4120052001IAF_111,,,,,2020-05-25 09:43:31,拔管成功,SBT失败,2020-05-25 09:02:00,条件SBT筛选,xsV300,CPAP,CPAP,CPAP,2128
