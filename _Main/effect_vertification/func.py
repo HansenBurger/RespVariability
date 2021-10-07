@@ -33,6 +33,7 @@ def MainTableBuild():
                                   conf=None)
 
     dynamic.df = FormProcess.FormPreProcess(df_loc=table_loc)
+    dynamic.df_new = func.pd.DataFrame()
     FormProcess.TimeShift(dynamic.df, static.time_col_name)
 
 
@@ -41,24 +42,26 @@ def TestTableBuild():
 
     table_loc = 'test.csv'
     dynamic.df = FormProcess.FormPreProcess(df_loc=table_loc)
+    dynamic.df_new = func.DataFrame()
     FormProcess.TimeShift(dynamic.df, static.time_col_name)
 
 
 @basic.measure
-def GenerateObjList():
+def GenerateObjList(table_len=None):
 
     colname = static.table_col_map
 
-    for i in dynamic.df.index:
+    for i in dynamic.df.index[:table_len]:
 
         obj = data.DomainTable()
 
-        obj.pid = dynamic.df.loc[i, colname['patient ID']]
+        obj.pid = dynamic.df.loc[i, colname['patient ID']].item()
         obj.time = dynamic.df.loc[i, colname['record time']]
         obj.rid = dynamic.df.loc[i, colname['record ID']]
         obj.zdt = dynamic.df.loc[i, colname['zdt name']]
         obj.zpx = dynamic.df.loc[i, colname['zpx name']]
         obj.end = dynamic.df.loc[i, colname['exTube end']]
+        obj.end = 1 if '成功' in obj.end else 0
 
         dynamic.objlist_table.append(obj)
 
@@ -138,13 +141,13 @@ def GetBinOutput():
 @basic.measure
 def Calculate():
 
-    objlist = dynamic.objlist_record
-    pidlist = [x.pid for x in dynamic.objlist_table]
+    objlist_1 = dynamic.objlist_record
+    objlist_2 = dynamic.objlist_table
 
-    for i in range(len(objlist)):  # For each record
+    for i in range(len(objlist_1)):  # For each record
 
-        pid = pidlist[i]
-        record = objlist[i]
+        record = objlist_1[i]
+        pid = objlist_2[i].pid
         p_range = len(record.p_start)
 
         for j in range(p_range):  # For each resp
@@ -159,8 +162,6 @@ def Calculate():
             else:
                 resp.RR = counter.RR(record.sample_rate)
                 resp.V_T_i = counter.V_t_i()
-                if resp.V_T_i == 0:
-                    a = 1
                 resp.V_T_e = counter.V_t_e()
                 resp.wob = counter.WOB()
                 resp.VE = counter.VE(resp.RR, resp.V_T_i)
@@ -169,7 +170,16 @@ def Calculate():
             record.objlist_resp.append(resp)
 
         print('RespInfo of {0}\'s record: total | {1}, valid | {2}'.format(
-            pid, p_range, len(record.objlist_resp)))
+            pid,
+            str(p_range).rjust(4, '0'),
+            str(len(record.objlist_resp)).rjust(4, '0')))
+
+        if len(record.objlist_resp) == 0:
+            objlist_1[i] = None
+            objlist_2[i] = None
+
+    dynamic.objlist_record = [i for i in objlist_1 if i]
+    dynamic.objlist_table = [i for i in objlist_2 if i]
 
 
 @basic.measure
@@ -208,3 +218,72 @@ def MethodStanDev():
         obj_result.VE = method([x.VE for x in resp_list])
         obj_result.wob = method([x.wob for x in resp_list])
         obj_result.rsbi = method([x.rsbi for x in resp_list])
+
+
+@basic.measure
+def ResultAggregate():
+
+    objlist_1 = dynamic.objlist_record
+    objlist_2 = dynamic.objlist_table
+
+    for i in range(len(objlist_1)):
+
+        obj = data.DomainAggregate()
+
+        obj.pid = objlist_2[i].pid
+        obj.end = objlist_2[i].end
+        obj.RR_1 = objlist_1[i].obj_average.RR
+        obj.V_T_1 = objlist_1[i].obj_average.V_T
+        obj.VE_1 = objlist_1[i].obj_average.VE
+        obj.wob_1 = objlist_1[i].obj_average.wob
+        obj.rsbi_1 = objlist_1[i].obj_average.rsbi
+        obj.RR_2 = objlist_1[i].obj_standev.RR
+        obj.V_T_2 = objlist_1[i].obj_standev.V_T
+        obj.VE_2 = objlist_1[i].obj_standev.VE
+        obj.wob_2 = objlist_1[i].obj_standev.wob
+        obj.rsbi_2 = objlist_1[i].obj_standev.rsbi
+
+        dynamic.objlist_result.append(obj)
+
+
+@basic.measure
+def SaveTableBuild():
+
+    colname = static.result_name_map
+    df = dynamic.df_new
+    df[colname['patient ID']] = [x.pid for x in dynamic.objlist_result]
+    df[colname['exTube end']] = [x.end for x in dynamic.objlist_result]
+    df[colname['Average RR']] = [x.RR_1 for x in dynamic.objlist_result]
+    df[colname['Average V_T']] = [x.V_T_1 for x in dynamic.objlist_result]
+    df[colname['Average VE']] = [x.VE_1 for x in dynamic.objlist_result]
+    df[colname['Average WOB']] = [x.wob_1 for x in dynamic.objlist_result]
+    df[colname['Average RSBI']] = [x.rsbi_1 for x in dynamic.objlist_result]
+    df[colname['Standev RR']] = [x.RR_2 for x in dynamic.objlist_result]
+    df[colname['Standev V_T']] = [x.V_T_2 for x in dynamic.objlist_result]
+    df[colname['Standev VE']] = [x.VE_2 for x in dynamic.objlist_result]
+    df[colname['Standev WOB']] = [x.wob_2 for x in dynamic.objlist_result]
+    df[colname['Standev RSBI']] = [x.rsbi_2 for x in dynamic.objlist_result]
+
+    FormProcess.CsvToLocal(df, dynamic.save_form_loc,
+                           static.save_table_name['table result'])
+
+
+@basic.measure
+def SaveGraphs():
+
+    colname = static.result_name_map
+
+    draf = func.Draft(dynamic.save_graph_loc, dynamic.df_new)
+    draf.BoxPlot(colname['exTube end'], colname['Average RR'], 'rr_average')
+    draf.BoxPlot(colname['exTube end'], colname['Average V_T'], 'vt_average')
+    draf.BoxPlot(colname['exTube end'], colname['Average VE'], 've_average')
+    draf.BoxPlot(colname['exTube end'], colname['Average WOB'], 'wob_average')
+    draf.BoxPlot(colname['exTube end'], colname['Average RSBI'],
+                 'rsbi_average')
+
+    draf.BoxPlot(colname['exTube end'], colname['Standev RR'], 'rr_standev')
+    draf.BoxPlot(colname['exTube end'], colname['Standev V_T'], 'vt_standev')
+    draf.BoxPlot(colname['exTube end'], colname['Standev VE'], 've_standev')
+    draf.BoxPlot(colname['exTube end'], colname['Standev WOB'], 'wob_standev')
+    draf.BoxPlot(colname['exTube end'], colname['Standev RSBI'],
+                 'rsbi_standev')

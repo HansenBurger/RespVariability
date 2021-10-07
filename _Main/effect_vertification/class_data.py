@@ -49,14 +49,31 @@ class DataStatic(DataBasic):
             'volume': 4,
         }
 
+        self.result_name_map = {
+            'patient ID': 'PID',
+            'exTube end': 'endo_end',
+            'Average RR': 'RR_1',
+            'Average V_T': 'V_T_1',
+            'Average VE': 'VE_1',
+            'Average WOB': 'WOB_1',
+            'Average RSBI': 'RSBI_1',
+            'Standev RR': 'RR_2',
+            'Standev V_T': 'V_T_2',
+            'Standev VE': 'VE_2',
+            'Standev WOB': 'WOB_2',
+            'Standev RSBI': 'RSBI_2',
+        }
+
+        self.save_table_name = {'table result': 'records_pro_1h_ExTube_result'}
+
 
 class DataDynamic(DataBasic):
     def __init__(self):
         super().__init__()
         self.__df = None
+        self.__df_new = None
         self.__save_form_loc = ''
         self.__save_graph_loc = ''
-        self.__result_list = []
         self.__objlist_table = []
         self.__objlist_record = []
         self.__objlist_result = []
@@ -68,6 +85,14 @@ class DataDynamic(DataBasic):
     @df.setter
     def df(self, df):
         self.__df = df
+
+    @property
+    def df_new(self):
+        return self.__df_new
+
+    @df_new.setter
+    def df_new(self, df):
+        self.__df_new = df
 
     @property
     def save_form_loc(self):
@@ -84,14 +109,6 @@ class DataDynamic(DataBasic):
     @save_graph_loc.setter
     def save_graph_loc(self, v):
         self.__save_graph_loc = v
-
-    @property
-    def result_list(self):
-        return self.__result_list
-
-    @result_list.setter
-    def result_list(self, list_):
-        self.__result_list = list_
 
     @property
     def objlist_table(self):
@@ -469,3 +486,116 @@ class DomainStanDev(DataBasic):
     @rsbi.setter
     def rsbi(self, v):
         self.__rsbi = v
+
+
+class DomainAggregate(DataBasic):
+    def __init__(self):
+        super().__init__()
+        self.__pid = ''
+        self.__end = 0
+        self.__RR_1 = 0
+        self.__V_T_1 = 0
+        self.__VE_1 = 0
+        self.__wob_1 = 0
+        self.__rsbi_1 = 0
+        self.__RR_2 = 0
+        self.__V_T_2 = 0
+        self.__VE_2 = 0
+        self.__wob_2 = 0
+        self.__rsbi_2 = 0
+
+    @property
+    def pid(self):
+        return self.__pid
+
+    @pid.setter
+    def pid(self, v):
+        self.__pid = v
+
+    @property
+    def end(self):
+        return self.__end
+
+    @end.setter
+    def end(self, v):
+        self.__end = v
+
+    @property
+    def RR_1(self):
+        return self.__RR_1
+
+    @RR_1.setter
+    def RR_1(self, v):
+        self.__RR_1 = v
+
+    @property
+    def V_T_1(self):
+        return self.__V_T_1
+
+    @V_T_1.setter
+    def V_T_1(self, v):
+        self.__V_T_1 = v
+
+    @property
+    def VE_1(self):
+        return self.__VE_1
+
+    @VE_1.setter
+    def VE_1(self, v):
+        self.__VE_1 = v
+
+    @property
+    def wob_1(self):
+        return self.__wob_1
+
+    @wob_1.setter
+    def wob_1(self, v):
+        self.__wob_1 = v
+
+    @property
+    def rsbi_1(self):
+        return self.__rsbi_1
+
+    @rsbi_1.setter
+    def rsbi_1(self, v):
+        self.__rsbi_1 = v
+
+    @property
+    def RR_2(self):
+        return self.__RR_2
+
+    @RR_2.setter
+    def RR_2(self, v):
+        self.__RR_2 = v
+
+    @property
+    def V_T_2(self):
+        return self.__V_T_2
+
+    @V_T_2.setter
+    def V_T_2(self, v):
+        self.__V_T_2 = v
+
+    @property
+    def VE_2(self):
+        return self.__VE_2
+
+    @VE_2.setter
+    def VE_2(self, v):
+        self.__VE_2 = v
+
+    @property
+    def wob_2(self):
+        return self.__wob_2
+
+    @wob_2.setter
+    def wob_2(self, v):
+        self.__wob_2 = v
+
+    @property
+    def rsbi_2(self):
+        return self.__rsbi_2
+
+    @rsbi_2.setter
+    def rsbi_2(self, v):
+        self.__rsbi_2 = v

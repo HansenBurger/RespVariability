@@ -1,6 +1,8 @@
 from pathlib import Path, PurePath
+import pandas as pd
 import numpy as np
-from numpy.core.defchararray import array
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 class RecordFucBasic():
@@ -139,6 +141,9 @@ class Calculation(RecordFucBasic):
                     self.__LenMatch(self.__p_in, self.__v_in)
                     self.__LenMatch(self.__p_ex, self.__v_ex)
 
+                    if self.__v_in[-1] == 0:
+                        self.valid_tag = False
+
                 else:
                     self.valid_tag = False
             else:
@@ -190,3 +195,23 @@ class Analysis(RecordFucBasic):
         array_ = np.array(list_)
         result = np.std(array_)
         return round(result, 2)
+
+
+class Draft(RecordFucBasic):
+    def __init__(self, save_loc, df):
+        super().__init__()
+        self.__save_loc = save_loc
+        self.__df = df
+
+    def BoxPlot(self, x_label, y_label, fig_name):
+        saveloc = Path(self.__save_loc) / (fig_name + '.png')
+        sns.set_theme(style="whitegrid")
+        sns.boxplot(x=x_label, y=y_label, data=self.__df, order=[1, 0])
+        plt.savefig(saveloc)
+        plt.close()
+
+    def ViolinPlot(self, *args):
+        pass
+
+    def RocPlot(self, *args):
+        pass
