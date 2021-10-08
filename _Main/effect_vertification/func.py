@@ -2,6 +2,8 @@ import sys, pathlib, datetime
 
 import class_func as func
 import class_data as data
+import class_domain_0 as domain0
+import class_domain_1 as domain1
 
 sys.path.append(str(pathlib.Path.cwd().parents[1]))
 from Code import InIReaWri, FormProcess, PointProcess
@@ -33,7 +35,7 @@ def MainTableBuild():
                                   conf=None)
 
     dynamic.df = FormProcess.FormPreProcess(df_loc=table_loc)
-    dynamic.df_new = func.pd.DataFrame()
+    dynamic.df_new = FormProcess.FormPreProcess()
     FormProcess.TimeShift(dynamic.df, static.time_col_name)
 
 
@@ -42,7 +44,7 @@ def TestTableBuild():
 
     table_loc = 'test.csv'
     dynamic.df = FormProcess.FormPreProcess(df_loc=table_loc)
-    dynamic.df_new = func.DataFrame()
+    dynamic.df_new = FormProcess.FormPreProcess()
     FormProcess.TimeShift(dynamic.df, static.time_col_name)
 
 
@@ -53,7 +55,7 @@ def GenerateObjList(table_len=None):
 
     for i in dynamic.df.index[:table_len]:
 
-        obj = data.DomainTable()
+        obj = domain0.DomainTable()
 
         obj.pid = dynamic.df.loc[i, colname['patient ID']].item()
         obj.time = dynamic.df.loc[i, colname['record time']]
@@ -61,7 +63,7 @@ def GenerateObjList(table_len=None):
         obj.zdt = dynamic.df.loc[i, colname['zdt name']]
         obj.zpx = dynamic.df.loc[i, colname['zpx name']]
         obj.end = dynamic.df.loc[i, colname['exTube end']]
-        obj.end = 1 if '成功' in obj.end else 0
+        obj.end = 0 if '成功' in obj.end else 1
 
         dynamic.objlist_table.append(obj)
 
@@ -76,7 +78,7 @@ def GenerateFileLoc():
 
     for obj_1 in dynamic.objlist_table:
 
-        obj_2 = data.DomainRecord()
+        obj_2 = domain0.DomainRecord()
 
         process = func.FileLocBuild(data_loc, obj_1, obj_2)
         process.ZifLoc()
@@ -152,7 +154,7 @@ def Calculate():
 
         for j in range(p_range):  # For each resp
 
-            resp = data.DomainResp()
+            resp = domain1.DomainResp()
             counter = func.Calculation(record.p_start[j], record.p_end[j])
             counter.ValidityCheck(record.s_F, record.s_V, record.s_P)
 
@@ -189,7 +191,7 @@ def MethodAverage():
 
     for record in objlist:
 
-        record.obj_average = data.DomainAverage()
+        record.obj_average = domain1.DomainAverage()
         method = func.Analysis().Mean
         obj_result = record.obj_average
         resp_list = record.objlist_resp
@@ -208,7 +210,7 @@ def MethodStanDev():
 
     for record in objlist:
 
-        record.obj_standev = data.DomainStanDev()
+        record.obj_standev = domain1.DomainStanDev()
         method = func.Analysis().StanDev
         obj_result = record.obj_standev
         resp_list = record.objlist_resp
@@ -221,6 +223,25 @@ def MethodStanDev():
 
 
 @basic.measure
+def MethodHRA():
+
+    objlist = dynamic.objlist_record
+
+    for record in objlist:
+
+        record.obj_hra = domain1.DomainHRA()
+        method = func.Analysis().HRA
+        obj_result = record.obj_hra
+        resp_list = record.objlist_resp
+
+        obj_result.RR_s = method([x.RR for x in resp_list])
+        obj_result.V_T_s = method([x.V_T_i for x in resp_list])
+        obj_result.VE_s = method([x.VE for x in resp_list])
+        obj_result.wob_s = method([x.wob for x in resp_list])
+        obj_result.rsbi_s = method([x.rsbi for x in resp_list])
+
+
+@basic.measure
 def ResultAggregate():
 
     objlist_1 = dynamic.objlist_record
@@ -228,7 +249,7 @@ def ResultAggregate():
 
     for i in range(len(objlist_1)):
 
-        obj = data.DomainAggregate()
+        obj = domain0.DomainAggregate()
 
         obj.pid = objlist_2[i].pid
         obj.end = objlist_2[i].end
@@ -242,6 +263,11 @@ def ResultAggregate():
         obj.VE_2 = objlist_1[i].obj_standev.VE
         obj.wob_2 = objlist_1[i].obj_standev.wob
         obj.rsbi_2 = objlist_1[i].obj_standev.rsbi
+        obj.RR_3 = objlist_1[i].obj_hra.RR_s
+        obj.V_T_3 = objlist_1[i].obj_hra.V_T_s
+        obj.VE_3 = objlist_1[i].obj_hra.VE_s
+        obj.wob_3 = objlist_1[i].obj_hra.wob_s
+        obj.rsbi_3 = objlist_1[i].obj_hra.rsbi_s
 
         dynamic.objlist_result.append(obj)
 
@@ -263,8 +289,37 @@ def SaveTableBuild():
     df[colname['Standev VE']] = [x.VE_2 for x in dynamic.objlist_result]
     df[colname['Standev WOB']] = [x.wob_2 for x in dynamic.objlist_result]
     df[colname['Standev RSBI']] = [x.rsbi_2 for x in dynamic.objlist_result]
+    df[colname['HRA RR'][0]] = [x.RR_3['PI'] for x in dynamic.objlist_result]
+    df[colname['HRA RR'][1]] = [x.RR_3['GI'] for x in dynamic.objlist_result]
+    df[colname['HRA RR'][2]] = [x.RR_3['SI'] for x in dynamic.objlist_result]
+    df[colname['HRA V_T'][0]] = [x.V_T_3['PI'] for x in dynamic.objlist_result]
+    df[colname['HRA V_T'][1]] = [x.V_T_3['GI'] for x in dynamic.objlist_result]
+    df[colname['HRA V_T'][2]] = [x.V_T_3['SI'] for x in dynamic.objlist_result]
+    df[colname['HRA VE'][0]] = [x.VE_3['PI'] for x in dynamic.objlist_result]
+    df[colname['HRA VE'][1]] = [x.VE_3['GI'] for x in dynamic.objlist_result]
+    df[colname['HRA VE'][2]] = [x.VE_3['SI'] for x in dynamic.objlist_result]
+    df[colname['HRA WOB'][0]] = [x.wob_3['PI'] for x in dynamic.objlist_result]
+    df[colname['HRA WOB'][1]] = [x.wob_3['GI'] for x in dynamic.objlist_result]
+    df[colname['HRA WOB'][2]] = [x.wob_3['SI'] for x in dynamic.objlist_result]
+    df[colname['HRA RSBI'][0]] = [
+        x.rsbi_3['PI'] for x in dynamic.objlist_result
+    ]
+    df[colname['HRA RSBI'][1]] = [
+        x.rsbi_3['GI'] for x in dynamic.objlist_result
+    ]
+    df[colname['HRA RSBI'][2]] = [
+        x.rsbi_3['SI'] for x in dynamic.objlist_result
+    ]
 
-    FormProcess.CsvToLocal(df, dynamic.save_form_loc,
+    filt_a = (df[colname['Average RR']] < 80) & (df[colname['Average RSBI']] <
+                                                 400)
+    filt_b = df[colname['Standev WOB']] < 40
+    filt_c = (df[colname['HRA RR'][2]] < 0.5) & (df[
+        colname['HRA RSBI'][2]] > -20000) & (df[colname['HRA VE'][2]] < 100000)
+
+    dynamic.df_new = df.loc[filt_a & filt_b]
+
+    FormProcess.CsvToLocal(dynamic.df_new, dynamic.save_form_loc,
                            static.save_table_name['table result'])
 
 
@@ -287,3 +342,9 @@ def SaveGraphs():
     draf.BoxPlot(colname['exTube end'], colname['Standev WOB'], 'wob_standev')
     draf.BoxPlot(colname['exTube end'], colname['Standev RSBI'],
                  'rsbi_standev')
+
+    draf.BoxPlotMulti(colname['exTube end'], colname['HRA RR'], 'rr_HRA')
+    draf.BoxPlotMulti(colname['exTube end'], colname['HRA V_T'], 'vt_HRA')
+    draf.BoxPlotMulti(colname['exTube end'], colname['HRA VE'], 've_HRA')
+    draf.BoxPlotMulti(colname['exTube end'], colname['HRA WOB'], 'wob_HRA')
+    draf.BoxPlotMulti(colname['exTube end'], colname['HRA RSBI'], 'rsbi_HRA')

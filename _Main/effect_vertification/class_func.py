@@ -1,5 +1,4 @@
 from pathlib import Path, PurePath
-import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -186,6 +185,35 @@ class Analysis(RecordFucBasic):
     def __init__(self):
         super().__init__()
 
+    def __PI(self, a_0, a_1):
+        n = 0
+        m = 0
+        for i in range(len(a_0)):
+            n += 1 if a_0[i] < a_1[i] else 0
+            m += 1 if a_0[i] > a_1[i] else 0
+        pi = 100 * m / (n + m)
+        return round(pi, 2)
+
+    def __GI(self, a_0, a_1):
+        d1 = 0
+        d2 = 0
+        for i in range(len(a_0)):
+            d1 += (a_1[i] - a_0[i]) / np.sqrt(2) if a_0[i] < a_1[i] else 0
+            d2 += (a_0[i] - a_1[i]) / np.sqrt(2) if a_0[i] > a_1[i] else 0
+        gi = 100 * d1 / (d1 + d2)
+        return round(gi, 2)
+
+    def __SI(self, a_0, a_1):
+        theta_1 = 0
+        theta_2 = 0
+        for i in range(len(a_0)):
+            theta_1 += (np.arctan(a_1[i] / a_0[i]) -
+                        45) if a_0[i] < a_1[i] else 0
+            theta_2 += (-np.arctan(a_1[i] / a_0[i]) +
+                        45) if a_0[i] > a_1[i] else 0
+        si = 100 * theta_1 / (theta_1 + theta_2)
+        return round(si, 2)
+
     def Mean(self, list_):
         array_ = np.array(list_)
         result = np.mean(array_)
@@ -195,6 +223,14 @@ class Analysis(RecordFucBasic):
         array_ = np.array(list_)
         result = np.std(array_)
         return round(result, 2)
+
+    def HRA(self, list_):
+        array_0 = np.array(list_[:len(list_) - 1])
+        array_1 = np.array(list_[1:])
+        pi = self.__PI(array_0, array_1)
+        gi = self.__GI(array_0, array_1)
+        si = self.__SI(array_0, array_1)
+        return {'PI': pi, 'GI': gi, 'SI': si}
 
 
 class Draft(RecordFucBasic):
@@ -206,7 +242,25 @@ class Draft(RecordFucBasic):
     def BoxPlot(self, x_label, y_label, fig_name):
         saveloc = Path(self.__save_loc) / (fig_name + '.png')
         sns.set_theme(style="whitegrid")
-        sns.boxplot(x=x_label, y=y_label, data=self.__df, order=[1, 0])
+        sns.boxplot(x=x_label, y=y_label, data=self.__df, order=[0, 1])
+        plt.title(fig_name, fontsize=15)
+        plt.savefig(saveloc)
+        plt.close()
+
+    def BoxPlotMulti(self, x_label, y_labels, fig_name):
+        saveloc = Path(self.__save_loc) / (fig_name + '.png')
+        sns.set_theme(style="whitegrid")
+        sns.set(rc={'figure.figsize': (7.4, 3.3)})
+        plt.subplot(1, 3, 1)
+        sns.boxplot(x=x_label, y=y_labels[0], data=self.__df,
+                    order=[0, 1]).set_title(y_labels[0].split('_')[1])
+        plt.subplot(1, 3, 2)
+        sns.boxplot(x=x_label, y=y_labels[1], data=self.__df,
+                    order=[0, 1]).set_title(y_labels[1].split('_')[1])
+        plt.subplot(1, 3, 3)
+        sns.boxplot(x=x_label, y=y_labels[2], data=self.__df,
+                    order=[0, 1]).set_title(y_labels[2].split('_')[1])
+        plt.tight_layout()
         plt.savefig(saveloc)
         plt.close()
 

@@ -2,7 +2,7 @@ import pandas as pd
 from pathlib import Path
 
 
-def FormPreProcess(df_loc,
+def FormPreProcess(df_loc=None,
                    col_map=None,
                    drop_jud=None,
                    sort_jud=None,
@@ -15,31 +15,34 @@ def FormPreProcess(df_loc,
     reset_jud: reset the index (default true)
     add_index: add "Index" column at the end (default true)
     '''
+    if not df_loc:
+        df_tmp = pd.DataFrame()
 
-    if col_map:
-        if type(col_map) == dict:
-            df_tmp = pd.read_csv(df_loc, usecols=list(col_map.keys()))
-            df_tmp = df_tmp.rename(columns=col_map)
-        if type(col_map) == list:
-            df_tmp = pd.read_csv(df_loc, usecols=col_map)
     else:
-        df_tmp = pd.read_csv(df_loc)
+        if col_map:
+            if type(col_map) == dict:
+                df_tmp = pd.read_csv(df_loc, usecols=list(col_map.keys()))
+                df_tmp = df_tmp.rename(columns=col_map)
+            if type(col_map) == list:
+                df_tmp = pd.read_csv(df_loc, usecols=col_map)
+        else:
+            df_tmp = pd.read_csv(df_loc)
 
-    if drop_jud:
-        df_tmp = df_tmp.dropna(axis=0, how="any", subset=drop_jud)
+        if drop_jud:
+            df_tmp = df_tmp.dropna(axis=0, how="any", subset=drop_jud)
 
-    if sort_jud:
-        df_tmp = df_tmp.sort_values(by=sort_jud, ascending=True)
-        try:
-            df_tmp[sort_jud] = df_tmp[sort_jud].astype("uint32")
-        except:
-            print(sort_jud, ':unable to do type conversion')
+        if sort_jud:
+            df_tmp = df_tmp.sort_values(by=sort_jud, ascending=True)
+            try:
+                df_tmp[sort_jud] = df_tmp[sort_jud].astype("uint32")
+            except:
+                print(sort_jud, ':unable to do type conversion')
 
-    if reset_jud:
-        df_tmp = df_tmp.reset_index(drop=True)
+        if reset_jud:
+            df_tmp = df_tmp.reset_index(drop=True)
 
-    if nan_none:
-        df_tmp = df_tmp.where(df_tmp.notnull(), None)
+        if nan_none:
+            df_tmp = df_tmp.where(df_tmp.notnull(), None)
 
     return df_tmp
 
