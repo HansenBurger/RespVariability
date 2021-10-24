@@ -2,3 +2,4 @@
 .vscode/
 # ignore all file .json
 *.json
+*/__pycache__

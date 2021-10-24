@@ -15,7 +15,7 @@ class DataStatic(DataBasic):
                 'category': 'ResultRoute',
                 'name': 'FormFolder_new'
             },
-            'save grah': {
+            'save graph': {
                 'category': 'ResultRoute',
                 'name': 'GraphFolder'
             }
@@ -29,15 +29,25 @@ class DataStatic(DataBasic):
             'record time': 'Resp_t',
             'exTube time': 'endo_t',
             'exTube end': 'endo_end',
+            'venting time': 'vent_t',
             'machine type': 'machine',
             'vent m bin': 'vent_m_0',
             'vent m mid': 'vent_m_1',
             'vent m end': 'vent_m_2',
+            'PEEP setting': 'st_peep',
+            'PS setting': 'st_ps',
+            'PEEP + PS': 'st_sumP'
         }
 
         self.save_table_name = {
-            'table result 1': 'vent_mode_every30min',
-            'table result 2': 'records_pro_1h_ExTube'
+            '30min vm distri': 'Every30min_st_vm',
+            '30min peep distri': 'Every30min_st_peep',
+            '30min ps distri': 'Every30min_st_ps',
+            '30min sumP distri': 'Every30min_st_sumP',
+            'result: 1h\'s sumP10+PSV filt': 'Records_1h_sumP10_PSV',
+            'result: 1h\'s sumP12+PSV filt': 'Records_1h_sumP12_PSV',
+            'table result filted': 'records_pro_1h_ExTube',
+            'table result filted c': 'records_pro_1h_ExTube_c'
         }
 
     pass
@@ -52,10 +62,14 @@ class PIDGPObj(DataBasic):
         self.__resp_t_s = []
         self.__endo_t_s = []
         self.__ending_s = []
+        self.__still_t_s = []
         self.__machine_s = []
         self.__vtm_0_s = []
         self.__vtm_1_s = []
         self.__vtm_2_s = []
+        self.__st_peep_s = []
+        self.__st_ps_s = []
+        self.__st_sumP_s = []
 
     @property
     def df(self):
@@ -114,6 +128,14 @@ class PIDGPObj(DataBasic):
         self.__ending_s = series
 
     @property
+    def still_t_s(self):
+        return self.__still_t_s
+
+    @still_t_s.setter
+    def still_t_s(self, series):
+        self.__still_t_s = series
+
+    @property
     def machine_s(self):
         return self.__machine_s
 
@@ -153,8 +175,32 @@ class PIDGPObj(DataBasic):
     def vtm_2_s(self, series):
         self.__vtm_2_s = series
 
+    @property
+    def st_peep_s(self):
+        return self.__st_peep_s
 
-class VentModeObj(DataBasic):
+    @st_peep_s.setter
+    def st_peep_s(self, series):
+        self.__st_peep_s = series
+
+    @property
+    def st_ps_s(self):
+        return self.__st_ps_s
+
+    @st_ps_s.setter
+    def st_ps_s(self, series):
+        self.__st_ps_s = series
+
+    @property
+    def st_sumP_s(self):
+        return self.__st_sumP_s
+
+    @st_sumP_s.setter
+    def st_sumP_s(self, series):
+        self.__st_sumP_s = series
+
+
+class PIDInfoObj(DataBasic):
     def __init__(self):
         super().__init__()
         self.__pid = ''
@@ -163,6 +209,9 @@ class VentModeObj(DataBasic):
         self.__end_time = ''
         self.__machine = ''
         self.__mode_list = []
+        self.__st_peep_list = []
+        self.__st_ps_list = []
+        self.__st_sumP_list = []
 
     @property
     def pid(self):
@@ -212,17 +261,41 @@ class VentModeObj(DataBasic):
     def mode_list(self, list_):
         self.__mode_list = list_
 
+    @property
+    def st_peep_list(self):
+        return self.__st_peep_list
+
+    @st_peep_list.setter
+    def st_peep_list(self, list_):
+        self.__st_peep_list = list_
+
+    @property
+    def st_ps_list(self):
+        return self.__st_ps_list
+
+    @st_ps_list.setter
+    def st_ps_list(self, list_):
+        self.__st_ps_list = list_
+
+    @property
+    def st_sumP_list(self):
+        return self.__st_sumP_list
+
+    @st_sumP_list.setter
+    def st_sumP_list(self, list_):
+        self.__st_sumP_list = list_
+
 
 class DataDynamic(DataBasic):
     def __init__(self):
         super().__init__()
         self.__df_main = None
-        self.__df_new = None
+        self.__df_basic = None
+        self.__df_s_para = {}
         self.__save_form_loc = ''
         self.__save_graph_loc = ''
-        self.__obj_list_main = []
-        self.__obj_list_new = []
-        self.__vm_max_len = 0
+        self.__objlist_table = []
+        self.__objlist_pinfo = []
 
     @property
     def df_main(self):
@@ -233,12 +306,20 @@ class DataDynamic(DataBasic):
         self.__df_main = df
 
     @property
-    def df_new(self):
-        return self.__df_new
+    def df_basic(self):
+        return self.__df_basic
 
-    @df_new.setter
-    def df_new(self, df):
-        self.__df_new = df
+    @df_basic.setter
+    def df_basic(self, df):
+        self.__df_basic = df
+
+    @property
+    def df_s_para(self):
+        return self.__df_s_para
+
+    @df_s_para.setter
+    def df_s_para(self, dict_):
+        self.__df_s_para = dict_
 
     @property
     def save_form_loc(self):
@@ -257,25 +338,17 @@ class DataDynamic(DataBasic):
         self.__save_graph_loc = v
 
     @property
-    def obj_list_main(self):
-        return self.__obj_list_main
+    def objlist_table(self):
+        return self.__objlist_table
 
-    @obj_list_main.setter
-    def obj_list_main(self, list_):
-        self.__obj_list_main = list_
-
-    @property
-    def obj_list_new(self):
-        return self.__obj_list_new
-
-    @obj_list_new.setter
-    def obj_list_new(self, list_):
-        self.__obj_list_new = list_
+    @objlist_table.setter
+    def objlist_table(self, list_):
+        self.__objlist_table = list_
 
     @property
-    def vm_max_len(self):
-        return self.__vm_max_len
+    def objlist_pinfo(self):
+        return self.__objlist_pinfo
 
-    @vm_max_len.setter
-    def vm_max_len(self, v):
-        self.__vm_max_len = v
+    @objlist_pinfo.setter
+    def objlist_pinfo(self, list_):
+        self.__objlist_pinfo = list_

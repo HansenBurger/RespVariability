@@ -48,10 +48,11 @@ def DataChecker():
     func_2.GenerateObjList()
     func_2.GenerateFileLoc()
     func_2.GetBinOutput()
+    func_2.ResultGenerate()
     func_2.TableBuild()
 
 
-def ModeProcessor():
+def StProcessor():
     '''
     ---- ModeProcessor ----
         Description: Check the ventilation pattern of the PID in chronological order
@@ -63,20 +64,25 @@ def ModeProcessor():
             3. Generate objlist ( attributes: necessary colnames for the new table )
             4. Save output to table and store
     '''
-    func_3.SaveLocGenerate()
+    func_3.SaveLocGenerate(StProcessor.__name__)
     func_3.MainTableBuild()
-    func_3.GenerateObjList_gp()
-    func_3.ValidateObjList_gp()
-    func_3.GenerateObjList_pid()
-    func_3.TableBuild()
-    func_3.TableProcess_1h()
+    func_3.TableRead_GP()
+    func_3.RecordValidate_GP()
+    func_3.CombineRecordsToPinfo()
+    func_3.ResultBuild_PID()
+    func_3.ResultBuild_VM()
+    func_3.ResultBuild_ST_PEEP()
+    func_3.ResultBuild_ST_PS()
+    func_3.ResultBuild_ST_SUMP()
+    func_3.TableProcess_SumP10(1)
+    func_3.TableProcess_SumP12(1)
 
 
 def main():
     print('I am the storm that is approooooaching !')
     TableFilter
     DataChecker
-    ModeProcessor
+    StProcessor()
 
 
 if __name__ == '__main__':

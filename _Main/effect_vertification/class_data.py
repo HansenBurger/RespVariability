@@ -57,11 +57,15 @@ class DataStatic(DataBasic):
             'Average VE': 'VE_1',
             'Average WOB': 'WOB_1',
             'Average RSBI': 'RSBI_1',
+            'Average MP(Jm)': 'MP_jm_1',
+            'Average MP(JL)': 'MP_jl_1',
             'Standev RR': 'RR_2',
             'Standev V_T': 'V_T_2',
             'Standev VE': 'VE_2',
             'Standev WOB': 'WOB_2',
             'Standev RSBI': 'RSBI_2',
+            'Standev MP(Jm)': 'MP_jm_2',
+            'Standev MP(JL)': 'MP_jl_2',
             'HRA RR': ['RR_PI', 'RR_GI', 'RR_SI'],
             'HRA V_T': ['V_T_PI', 'V_T_GI', 'V_T_SI'],
             'HRA VE': ['VE_PI', 'VE_GI', 'VE_SI'],
@@ -69,7 +73,10 @@ class DataStatic(DataBasic):
             'HRA RSBI': ['RSBI_PI', 'RSBI_GI', 'RSBI_SI'],
         }
 
-        self.save_table_name = {'table result': 'records_pro_1h_ExTube_result'}
+        self.save_table_name = {
+            'result linear': 'Pro_1h_ExTube_linear',
+            'result nonlinear': 'Pro_1h_ExTube_nonlinear'
+        }
 
 
 class DataDynamic(DataBasic):
@@ -81,7 +88,8 @@ class DataDynamic(DataBasic):
         self.__save_graph_loc = ''
         self.__objlist_table = []
         self.__objlist_record = []
-        self.__objlist_result = []
+        self.__linear_results = []
+        self.__nonlinear_results = []
 
     @property
     def df(self):
@@ -132,9 +140,17 @@ class DataDynamic(DataBasic):
         self.__objlist_record = list_
 
     @property
-    def objlist_result(self):
-        return self.__objlist_result
+    def linear_results(self):
+        return self.__linear_results
 
-    @objlist_result.setter
-    def objlist_result(self, list_):
-        self.__objlist_result = list_
+    @linear_results.setter
+    def linear_results(self, list_):
+        self.__linear_results = list_
+
+    @property
+    def nonlinear_results(self):
+        return self.__nonlinear_results
+
+    @nonlinear_results.setter
+    def nonlinear_results(self, list_):
+        self.__nonlinear_results = list_

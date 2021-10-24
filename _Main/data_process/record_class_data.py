@@ -1,3 +1,6 @@
+import re
+
+
 class DataBasic():
     def __init__(self) -> None:
         pass
@@ -33,11 +36,14 @@ class DataStatic(DataBasic):
         self.output_name_map = {
             'machine name': 'machineType',
             'sample rate': 'RefSampleRate',
-            'para data index': 'uiDataIndex',
-            'vent type list': 'st_VENT_TYPE',
-            'vent mode list': 'st_VENT_MODE',
-            'mand type list': 'st_MAND_TYPE',
-            'start index': 0
+            'para index': 'uiDataIndex',
+            'vent type': 'st_VENT_TYPE',
+            'vent mode': 'st_VENT_MODE',
+            'mand type': 'st_MAND_TYPE',
+            'PEEP setting': 'st_PEEP',
+            'PS setting': 'st_P_SUPP',
+            'start index': 0,
+            'flow index': 2
         }
 
         self.result_name_map = {
@@ -45,15 +51,19 @@ class DataStatic(DataBasic):
             'vent m bin': 'vent_m_0',
             'vent m mid': 'vent_m_1',
             'vent m end': 'vent_m_2',
-            'vent still time': 'vent_t'
+            'still time': 'vent_t',
+            'peep setting': 'st_peep',
+            'ps setting': 'st_ps',
+            'peep + ps': 'st_sumP'
         }
 
         self.save_table_name = {
             'table result': 'record_check',
+            'table result c': 'record_check_c'
         }
 
 
-class RecordObj(DataBasic):
+class DomainTable(DataBasic):
     def __init__(self):
         super().__init__()
         self.__row = 0
@@ -61,20 +71,7 @@ class RecordObj(DataBasic):
         self.__rid = ''
         self.__zdt = ''
         self.__zpx = ''
-        self.__zif_loc = ''
-        self.__zdt_loc = ''
-        self.__zpx_loc = ''
-        self.__machine = ''
-        self.__sample_rate = ''
-        self.__start_ind = []
-        self.__para_ind = []  # keep np array
-        self.__vent_type = []
-        self.__vent_mode = []
-        self.__mand_type = []
-        self.__still_time = 0
-        self.__v_m_list = []
 
-    # use the hastter to judge if there any attri
     @property
     def row(self):
         return self.__row
@@ -131,6 +128,24 @@ class RecordObj(DataBasic):
     def zpx(self):
         del self.__zpx
 
+
+class DomainRecord(DataBasic):
+    def __init__(self):
+        super().__init__()
+        self.__zif_loc = ''
+        self.__zdt_loc = ''
+        self.__zpx_loc = ''
+        self.__machine = ''
+        self.__sample_rate = ''
+        self.__start_ind = []
+        self.__s_F = []
+        self.__para_ind = []  # keep np array
+        self.__st_peep = []
+        self.__st_ps = []
+        self.__vent_type = []
+        self.__vent_mode = []
+        self.__mand_type = []
+
     @property
     def zif_loc(self):
         return self.__zif_loc
@@ -184,6 +199,14 @@ class RecordObj(DataBasic):
         del self.__start_ind
 
     @property
+    def s_F(self):
+        return self.__s_F
+
+    @s_F.setter
+    def s_F(self, list_):
+        self.__s_F = list_
+
+    @property
     def para_ind(self):
         return self.__para_ind
 
@@ -194,6 +217,22 @@ class RecordObj(DataBasic):
     @para_ind.deleter
     def para_ind(self):
         del self.__para_ind
+
+    @property
+    def st_peep(self):
+        return self.__st_peep
+
+    @st_peep.setter
+    def st_peep(self, list_):
+        self.__st_peep = list_
+
+    @property
+    def st_ps(self):
+        return self.__st_ps
+
+    @st_ps.setter
+    def st_ps(self, list_):
+        self.__st_ps = list_
 
     @property
     def vent_type(self):
@@ -231,6 +270,17 @@ class RecordObj(DataBasic):
     def mand_type(self):
         del self.__mand_type
 
+
+class DomainResult(DataBasic):
+    def __init__(self):
+        super().__init__()
+
+        self.__still_time = 0
+        self.__v_m_list = []
+        self.__peep_list = []
+        self.__ps_list = []
+        self.__sumP_list = []
+
     @property
     def still_time(self):
         return self.__still_time
@@ -247,13 +297,39 @@ class RecordObj(DataBasic):
     def v_m_list(self, list_):
         self.__v_m_list = list_
 
+    @property
+    def peep_list(self):
+        return self.__peep_list
+
+    @peep_list.setter
+    def peep_list(self, list_):
+        self.__peep_list = list_
+
+    @property
+    def ps_list(self):
+        return self.__ps_list
+
+    @ps_list.setter
+    def ps_list(self, list_):
+        self.__ps_list = list_
+
+    @property
+    def sumP_list(self):
+        return self.__sumP_list
+
+    @sumP_list.setter
+    def sumP_list(self, list_):
+        self.__sumP_list = list_
+
 
 class DataDynamic(DataBasic):
     def __init__(self):
         super().__init__()
         self.__df = None
         self.__save_loc = ''
-        self.__obj_list = []
+        self.__objlist_table = []
+        self.__objlist_record = []
+        self.__objlist_result = []
 
     @property
     def df(self):
@@ -272,9 +348,25 @@ class DataDynamic(DataBasic):
         self.__save_loc = v
 
     @property
-    def obj_list(self):
-        return self.__obj_list
+    def objlist_table(self):
+        return self.__objlist_table
 
-    @obj_list.setter
-    def obj_list(self, list_):
-        self.__obj_list = list_
+    @objlist_table.setter
+    def objlist_table(self, list_):
+        self.__objlist_table = list_
+
+    @property
+    def objlist_record(self):
+        return self.__objlist_record
+
+    @objlist_record.setter
+    def objlist_record(self, list_):
+        self.__objlist_record = list_
+
+    @property
+    def objlist_result(self):
+        return self.__objlist_result
+
+    @objlist_result.setter
+    def objlist_result(self, list_):
+        self.__objlist_result = list_

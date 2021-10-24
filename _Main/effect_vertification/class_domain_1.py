@@ -13,8 +13,8 @@ class DomainResp(DomainBasic):
         self.__wob = 0
         self.__wob_a = 0
         self.__wob_b = 0
-        self.__mp_area = 0
-        self.__mp_formula = 0
+        self.__mp_jm = 0
+        self.__mp_jl = 0
         self.__rsbi = 0
 
     @property
@@ -58,6 +58,38 @@ class DomainResp(DomainBasic):
         self.__wob = v
 
     @property
+    def wob_a(self):
+        return self.__wob_a
+
+    @wob_a.setter
+    def wob_a(self, v):
+        self.__wob_a = v
+
+    @property
+    def wob_b(self):
+        return self.__wob_b
+
+    @wob_b.setter
+    def wob_b(self, v):
+        self.__wob_b = v
+
+    @property
+    def mp_jm(self):
+        return self.__mp_jm
+
+    @mp_jm.setter
+    def mp_jm(self, v):
+        self.__mp_jm = v
+
+    @property
+    def mp_jl(self):
+        return self.__mp_jl
+
+    @mp_jl.setter
+    def mp_jl(self, v):
+        self.__mp_jl = v
+
+    @property
     def rsbi(self):
         return self.__rsbi
 
@@ -74,6 +106,8 @@ class DomainAverage(DomainBasic):
         self.__VE = 0
         self.__wob = 0
         self.__rsbi = 0
+        self.__mp_jm = 0
+        self.__mp_jl = 0
 
     @property
     def RR(self):
@@ -114,6 +148,22 @@ class DomainAverage(DomainBasic):
     @rsbi.setter
     def rsbi(self, v):
         self.__rsbi = v
+
+    @property
+    def mp_jm(self):
+        return self.__mp_jm
+
+    @mp_jm.setter
+    def mp_jm(self, v):
+        self.__mp_jm = v
+
+    @property
+    def mp_jl(self):
+        return self.__mp_jl
+
+    @mp_jl.setter
+    def mp_jl(self, v):
+        self.__mp_jl = v
 
 
 class DomainStanDev(DomainBasic):
@@ -124,6 +174,8 @@ class DomainStanDev(DomainBasic):
         self.__VE = 0
         self.__wob = 0
         self.__rsbi = 0
+        self.__mp_jm = 0
+        self.__mp_jl = 0
 
     @property
     def RR(self):
@@ -164,6 +216,22 @@ class DomainStanDev(DomainBasic):
     @rsbi.setter
     def rsbi(self, v):
         self.__rsbi = v
+
+    @property
+    def mp_jm(self):
+        return self.__mp_jm
+
+    @mp_jm.setter
+    def mp_jm(self, v):
+        self.__mp_jm = v
+
+    @property
+    def mp_jl(self):
+        return self.__mp_jl
+
+    @mp_jl.setter
+    def mp_jl(self, v):
+        self.__mp_jl = v
 
 
 class DomainHRA(DomainBasic):

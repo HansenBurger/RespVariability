@@ -207,16 +207,21 @@ class DomainAggregate(DomainBasic):
         super().__init__()
         self.__pid = ''
         self.__end = 0
+        self.__resp = None
         self.__RR_1 = 0
         self.__V_T_1 = 0
         self.__VE_1 = 0
         self.__wob_1 = 0
         self.__rsbi_1 = 0
+        self.__mp_jm_1 = 0
+        self.__mp_jl_1 = 0
         self.__RR_2 = 0
         self.__V_T_2 = 0
         self.__VE_2 = 0
         self.__wob_2 = 0
         self.__rsbi_2 = 0
+        self.__mp_jm_2 = 0
+        self.__mp_jl_2 = 0
         self.__RR_3 = {}
         self.__V_T_3 = {}
         self.__VE_3 = {}
@@ -238,6 +243,14 @@ class DomainAggregate(DomainBasic):
     @end.setter
     def end(self, v):
         self.__end = v
+
+    @property
+    def resp(self):
+        return self.__resp
+
+    @resp.setter
+    def resp(self, v):
+        self.__resp = v
 
     @property
     def RR_1(self):
@@ -280,6 +293,22 @@ class DomainAggregate(DomainBasic):
         self.__rsbi_1 = v
 
     @property
+    def mp_jm_1(self):
+        return self.__mp_jm_1
+
+    @mp_jm_1.setter
+    def mp_jm_1(self, v):
+        self.__mp_jm_1 = v
+
+    @property
+    def mp_jl_1(self):
+        return self.__mp_jl_1
+
+    @mp_jl_1.setter
+    def mp_jl_1(self, v):
+        self.__mp_jl_1 = v
+
+    @property
     def RR_2(self):
         return self.__RR_2
 
@@ -318,6 +347,22 @@ class DomainAggregate(DomainBasic):
     @rsbi_2.setter
     def rsbi_2(self, v):
         self.__rsbi_2 = v
+
+    @property
+    def mp_jm_2(self):
+        return self.__mp_jm_2
+
+    @mp_jm_2.setter
+    def mp_jm_2(self, v):
+        self.__mp_jm_2 = v
+
+    @property
+    def mp_jl_2(self):
+        return self.__mp_jl_2
+
+    @mp_jl_2.setter
+    def mp_jl_2(self, v):
+        self.__mp_jl_2 = v
 
     @property
     def RR_3(self):

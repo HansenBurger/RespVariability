@@ -1,4 +1,9 @@
 import pandas as pd
+import seaborn as sns
+import numpy as np
+import matplotlib.pyplot as plt
+from pathlib import Path
+from datetime import timedelta
 
 
 class FuncBasic():
@@ -54,19 +59,32 @@ class Transmit(FuncBasic):
         else:
             return series.unique().item()
 
+    def __ExtractSetting(self, series):
+        gap_tag = '/'
+        st_result = []
+
+        for i in self.__obj1.df.index:
+
+            st_content = series.loc[i].split(gap_tag)
+            st_end_loc = self.__obj1.df.index[-1]
+            st_tmp_list = st_content if i == st_end_loc else st_content[1:]
+            st_result.extend(st_tmp_list)
+
+        st_result.reverse()
+
+        return st_result
+
     def __ExtractVentmode(self):
         vent_m_list = []
 
         for i in self.__obj1.df.index:
 
             if i != self.__obj1.df.index[-1]:
-
                 vm_0 = self.__obj1.vtm_0_s.loc[i]
                 vm_1 = self.__obj1.vtm_1_s.loc[i]
                 vent_m_list.extend([vm_0, vm_1])
 
             else:
-
                 vm_0 = self.__obj1.vtm_0_s.loc[i]
                 vm_1 = self.__obj1.vtm_1_s.loc[i]
                 vm_2 = self.__obj1.vtm_2_s.loc[i]
@@ -76,21 +94,107 @@ class Transmit(FuncBasic):
 
         return vent_m_list
 
-    def TransmitValue(self):
+    def TransmitValue_Basic(self):
         self.__obj2.pid = self.__ExtractValue(self.__obj1.pid_s)
         self.__obj2.icu = self.__ExtractValue(self.__obj1.icu_s)
         self.__obj2.end_state = self.__ExtractValue(self.__obj1.ending_s)
         self.__obj2.machine = self.__ExtractValue(self.__obj1.machine_s)
-        self.__obj2.end_time = self.__obj1.resp_t_s.iloc[-1]
+        self.__obj2.end_time = self.__obj1.resp_t_s.iloc[-1] + timedelta(
+            seconds=self.__obj1.still_t_s.iloc[-1].item())
+
+    def TransmitValue_VM(self):
         self.__obj2.mode_list = self.__ExtractVentmode()
+
+    def TransmitValue_ST(self):
+        self.__obj2.st_peep_list = self.__ExtractSetting(self.__obj1.st_peep_s)
+        self.__obj2.st_ps_list = self.__ExtractSetting(self.__obj1.st_ps_s)
+        self.__obj2.st_sumP_list = self.__ExtractSetting(self.__obj1.st_sumP_s)
+
+
+class Charts():
+    def __init__(self, df_l, df_r, info_list, save_loc):
+        self.__df_l = df_l
+        self.__df_r = df_r
+        self.df_concat = None
+        self.__info = info_list
+        self.__save_loc = str(save_loc)
+
+    def __ClassifySeriesProcess(self, colname_class):
+        colvalue_map = {'成功': 0, '失败': 1}
+        df = self.df_concat.copy()
+
+        for i in df.index:
+            for key in colvalue_map.keys():
+                if key in df.loc[i, colname_class]:
+                    df.loc[i, colname_class] = colvalue_map[key]
+                    break
+
+        return df
+
+    def TableBuild(self, para_list):
+        para_matrix = np.array(para_list)
+        para_matrix = np.transpose(para_matrix)
+
+        for i in range(para_matrix.shape[0]):
+            col_name = '_'.join(
+                [self.__info[0],
+                 str(i * 30).rjust(3, '0'), 'min'])
+            col_value = para_matrix[i]
+            self.__df_r[col_name] = col_value\
+
+        self.df_concat = pd.concat([self.__df_l, self.__df_r], axis=1)
+
+    def DFInfoOutput(self, colname_gp_s, colname_class):
+        df = self.__ClassifySeriesProcess(colname_class)
+        txt_loc = str(Path(self.__save_loc) / (self.__info[1] + '.txt'))
+
+        with open(txt_loc, 'w') as f:
+
+            for colname_gp in colname_gp_s:
+                f.write('{0}\'s distribution info: \n'.format(colname_gp))
+                gp = pd.DataFrame.groupby(df, by=colname_gp)
+                gp_cat_list = df[colname_gp].unique().tolist()
+                gp_cat_list = [x for x in gp_cat_list if x]  # drop none value
+                gp_cat_list.sort()
+
+                for cat in gp_cat_list:
+                    df_tmp = gp.get_group(cat)
+                    succ_len = df_tmp.loc[df_tmp[colname_class] == 0].shape[0]
+                    fail_len = df_tmp.loc[df_tmp[colname_class] == 1].shape[0]
+                    f.write('{0}: succ {1} | fail {2} \n'.format(
+                        cat, succ_len, fail_len))
+
+                f.write('\n')
+
+    def GroupBarPlot(self, x_label_s, hue_label):
+        for x_label in x_label_s:
+            fig_name = x_label
+            saveloc = Path(self.__save_loc) / (fig_name + '.png')
+            df = self.__ClassifySeriesProcess(hue_label)
+            df = df.loc[(df[x_label] != '') & (df[x_label] != None)]
+            df = df.sort_values(by=[x_label])
+
+            sns.set(rc={'figure.figsize': (13, 8)},
+                    style='whitegrid',
+                    font_scale=0.7)
+            fx = sns.histplot(data=df,
+                              x=x_label,
+                              hue=hue_label,
+                              hue_order=[1, 0],
+                              multiple="stack",
+                              shrink=.9)
+            fx.set(xlabel=None, ylabel=None)
+            fx.tick_params(axis='x', rotation=45)
+            plt.title(fig_name, fontsize=15)
+            plt.savefig(saveloc)
+            plt.close()
 
 
 class TableQuery(FuncBasic):
-    def __init__(self, df_1, df_2):
+    def __init__(self, df_whole, df_list):
         super().__init__()
-        self.__df1 = df_1
-        self.__df2 = df_2
-        self.__index = []
+        self.__df1 = df_whole
+        self.__df2 = pd.concat(df_list, axis=1)
         self.df = None
 
     def __PSVFilter(self, series):
@@ -98,43 +202,37 @@ class TableQuery(FuncBasic):
         filt = series.str.contains(mode[0]) | series.str.contains(mode[1])
         return filt
 
-    def __ColnameGenerater(self, v):
-        info = ['mode', 'min']
-        colname = []
-        for i in range(int(v / 30) + 1):
-            colname.append('_'.join(
-                [info[0], str(i * 30).rjust(3, '0'), info[1]]))
-        return colname
+    def __SumPressureFilter(self, series):
+        threshold = [10, 12, 5]
+        series = series.convert_dtypes()
+        series = series.astype('int32')
+        filt_0 = (series <= threshold[0]) & (series >= threshold[2])
+        filt_1 = (series <= threshold[1]) & (series >= threshold[2])
+        return {'sum_10': filt_0, 'sum_12': filt_1}
 
-    def __TableFilt_1h(self):
+    def TableFilt_PSV(self, colname_list):
+        df = self.__df2
+        for i in colname_list:
+            filt = self.__PSVFilter(df[i])
+            df = df.loc[filt]
+        self.__df2 = df
 
-        colname_list = self.__ColnameGenerater(60)
-        filt_0 = self.__PSVFilter(self.__df2[colname_list[0]])
-        filt_1 = self.__PSVFilter(self.__df2[colname_list[1]])
-        filt_2 = self.__PSVFilter(self.__df2[colname_list[2]])
-        self.__df2 = self.__df2.loc[filt_0 & filt_1 & filt_2]
+    def TableFilt_SumP(self, colname_list, filt_mode):
+        df = self.__df2
+        for i in colname_list:
+            filt = self.__SumPressureFilter(df[i])[filt_mode]
+            df = df.loc[filt]
+        self.__df2 = df
 
-    def ConcatQuery(self, colname_list):
+    def ConcatQueryByTime(self, col_pid, hour_set):
+        gp = pd.DataFrame.groupby(self.__df1, col_pid)
 
-        self.__TableFilt_1h()
+        for pid in self.__df2[col_pid].unique().tolist():
+            df_tmp = gp.get_group(pid)
+            df_tmp_ = df_tmp.iloc[::-1][:hour_set]
+            if not df_tmp_.empty and df_tmp_.shape[0] == hour_set:
+                self.df = pd.concat([self.df, df_tmp_],
+                                    axis=0,
+                                    ignore_index=True)
 
-        gp_1 = pd.DataFrame.groupby(self.__df1, colname_list[0])
-        gp_2 = pd.DataFrame.groupby(self.__df2, colname_list[0])
-
-        for pid in self.__df2[colname_list[0]].unique().tolist():
-
-            df_main = gp_1.get_group(pid)
-            df_depend = gp_2.get_group(pid)
-
-            filt = df_main[colname_list[1]].isin(df_depend[colname_list[2]])
-            df_main = df_main.loc[filt]
-
-            if not df_main.empty:
-                self.__index.append(df_main.index[0])
-
-            del df_main, df_depend, filt
-
-        del gp_1, gp_2
-
-        self.df = self.__df1.iloc[self.__index]  #assignment creats new address
         self.df = self.df.reset_index(drop=True)

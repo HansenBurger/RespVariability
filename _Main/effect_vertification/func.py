@@ -165,9 +165,17 @@ def Calculate():
                 resp.RR = counter.RR(record.sample_rate)
                 resp.V_T_i = counter.V_t_i()
                 resp.V_T_e = counter.V_t_e()
-                resp.wob = counter.WOB()
                 resp.VE = counter.VE(resp.RR, resp.V_T_i)
                 resp.rsbi = counter.RSBI(resp.RR, resp.V_T_i)
+
+                wob_output = counter.WOB()
+                resp.wob = wob_output[0]
+                resp.wob_a = wob_output[1]
+                resp.wob_b = wob_output[2]
+
+                mp_output = counter.MP_Area(resp.RR, resp.V_T_i, resp.wob_a)
+                resp.mp_jm = mp_output[0]
+                resp.mp_jl = mp_output[1]
 
             record.objlist_resp.append(resp)
 
@@ -182,6 +190,53 @@ def Calculate():
 
     dynamic.objlist_record = [i for i in objlist_1 if i]
     dynamic.objlist_table = [i for i in objlist_2 if i]
+
+
+@basic.measure
+def ScatterPlotPer():
+
+    objlist_1 = dynamic.objlist_record
+    objlist_2 = dynamic.objlist_table
+    loc = dynamic.save_graph_loc
+
+    for i in range(len(objlist_1)):
+
+        resp_list = objlist_1[i].objlist_resp
+        pid = str(objlist_2[i].pid)
+        end = str(objlist_2[i].end)
+
+        df = FormProcess.FormPreProcess()
+        RR = [x.RR for x in resp_list]
+        df['RR_0'] = RR[:len(RR) - 1]
+        df['RR_1'] = RR[1:]
+        VT = [x.V_T_i for x in resp_list]
+        df['VT_0'] = VT[:len(VT) - 1]
+        df['VT_1'] = VT[1:]
+        VE = [x.VE for x in resp_list]
+        df['VE_0'] = VE[:len(VE) - 1]
+        df['VE_1'] = VE[1:]
+        wob = [x.wob for x in resp_list]
+        df['WOB_0'] = wob[:len(wob) - 1]
+        df['WOB_1'] = wob[1:]
+        rsbi = [x.rsbi for x in resp_list]
+        df['RSBI_0'] = rsbi[:len(rsbi) - 1]
+        df['RSBI_1'] = rsbi[1:]
+
+        draft_p = func.Draft(loc, df)
+
+        draft_p.ScatterPlot('RR_0', 'RR_1', 'RR', pid, end)
+        draft_p.ScatterPlot('VT_0', 'VT_1', 'VT', pid, end)
+        draft_p.ScatterPlot('VE_0', 'VE_1', 'VE', pid, end)
+        draft_p.ScatterPlot('WOB_0', 'WOB_1', 'WOB', pid, end)
+        draft_p.ScatterPlot('RSBI_0', 'RSBI_1', 'RSBI', pid, end)
+
+
+@basic.measure
+def WaveformPlotting():
+    #TODO
+    # each record generate the waveform
+    # static value: fig(width, height),
+    pass
 
 
 @basic.measure
@@ -201,6 +256,8 @@ def MethodAverage():
         obj_result.VE = method([x.VE for x in resp_list])
         obj_result.wob = method([x.wob for x in resp_list])
         obj_result.rsbi = method([x.rsbi for x in resp_list])
+        obj_result.mp_jm = method([x.mp_jm for x in resp_list])
+        obj_result.mp_jl = method([x.mp_jl for x in resp_list])
 
 
 @basic.measure
@@ -220,6 +277,8 @@ def MethodStanDev():
         obj_result.VE = method([x.VE for x in resp_list])
         obj_result.wob = method([x.wob for x in resp_list])
         obj_result.rsbi = method([x.rsbi for x in resp_list])
+        obj_result.mp_jm = method([x.mp_jm for x in resp_list])
+        obj_result.mp_jl = method([x.mp_jl for x in resp_list])
 
 
 @basic.measure
@@ -242,7 +301,7 @@ def MethodHRA():
 
 
 @basic.measure
-def ResultAggregate():
+def LinearAggregate():
 
     objlist_1 = dynamic.objlist_record
     objlist_2 = dynamic.objlist_table
@@ -253,6 +312,7 @@ def ResultAggregate():
 
         obj.pid = objlist_2[i].pid
         obj.end = objlist_2[i].end
+        obj.resp = objlist_1[i].objlist_resp
         obj.RR_1 = objlist_1[i].obj_average.RR
         obj.V_T_1 = objlist_1[i].obj_average.V_T
         obj.VE_1 = objlist_1[i].obj_average.VE
@@ -263,88 +323,191 @@ def ResultAggregate():
         obj.VE_2 = objlist_1[i].obj_standev.VE
         obj.wob_2 = objlist_1[i].obj_standev.wob
         obj.rsbi_2 = objlist_1[i].obj_standev.rsbi
+        obj.mp_jm_1 = objlist_1[i].obj_average.mp_jm
+        obj.mp_jl_1 = objlist_1[i].obj_average.mp_jl
+        obj.mp_jm_2 = objlist_1[i].obj_standev.mp_jm
+        obj.mp_jl_2 = objlist_1[i].obj_standev.mp_jl
+
+        dynamic.linear_results.append(obj)
+
+
+@basic.measure
+def NonlinearAggregate():
+
+    objlist_1 = dynamic.objlist_record
+    objlist_2 = dynamic.objlist_table
+
+    for i in range(len(objlist_1)):
+
+        obj = domain0.DomainAggregate()
+
+        obj.pid = objlist_2[i].pid
+        obj.end = objlist_2[i].end
         obj.RR_3 = objlist_1[i].obj_hra.RR_s
         obj.V_T_3 = objlist_1[i].obj_hra.V_T_s
         obj.VE_3 = objlist_1[i].obj_hra.VE_s
         obj.wob_3 = objlist_1[i].obj_hra.wob_s
         obj.rsbi_3 = objlist_1[i].obj_hra.rsbi_s
 
-        dynamic.objlist_result.append(obj)
+        dynamic.nonlinear_results.append(obj)
 
 
 @basic.measure
-def SaveTableBuild():
+def LinearTableBuild():
 
     colname = static.result_name_map
-    df = dynamic.df_new
-    df[colname['patient ID']] = [x.pid for x in dynamic.objlist_result]
-    df[colname['exTube end']] = [x.end for x in dynamic.objlist_result]
-    df[colname['Average RR']] = [x.RR_1 for x in dynamic.objlist_result]
-    df[colname['Average V_T']] = [x.V_T_1 for x in dynamic.objlist_result]
-    df[colname['Average VE']] = [x.VE_1 for x in dynamic.objlist_result]
-    df[colname['Average WOB']] = [x.wob_1 for x in dynamic.objlist_result]
-    df[colname['Average RSBI']] = [x.rsbi_1 for x in dynamic.objlist_result]
-    df[colname['Standev RR']] = [x.RR_2 for x in dynamic.objlist_result]
-    df[colname['Standev V_T']] = [x.V_T_2 for x in dynamic.objlist_result]
-    df[colname['Standev VE']] = [x.VE_2 for x in dynamic.objlist_result]
-    df[colname['Standev WOB']] = [x.wob_2 for x in dynamic.objlist_result]
-    df[colname['Standev RSBI']] = [x.rsbi_2 for x in dynamic.objlist_result]
-    df[colname['HRA RR'][0]] = [x.RR_3['PI'] for x in dynamic.objlist_result]
-    df[colname['HRA RR'][1]] = [x.RR_3['GI'] for x in dynamic.objlist_result]
-    df[colname['HRA RR'][2]] = [x.RR_3['SI'] for x in dynamic.objlist_result]
-    df[colname['HRA V_T'][0]] = [x.V_T_3['PI'] for x in dynamic.objlist_result]
-    df[colname['HRA V_T'][1]] = [x.V_T_3['GI'] for x in dynamic.objlist_result]
-    df[colname['HRA V_T'][2]] = [x.V_T_3['SI'] for x in dynamic.objlist_result]
-    df[colname['HRA VE'][0]] = [x.VE_3['PI'] for x in dynamic.objlist_result]
-    df[colname['HRA VE'][1]] = [x.VE_3['GI'] for x in dynamic.objlist_result]
-    df[colname['HRA VE'][2]] = [x.VE_3['SI'] for x in dynamic.objlist_result]
-    df[colname['HRA WOB'][0]] = [x.wob_3['PI'] for x in dynamic.objlist_result]
-    df[colname['HRA WOB'][1]] = [x.wob_3['GI'] for x in dynamic.objlist_result]
-    df[colname['HRA WOB'][2]] = [x.wob_3['SI'] for x in dynamic.objlist_result]
-    df[colname['HRA RSBI'][0]] = [
-        x.rsbi_3['PI'] for x in dynamic.objlist_result
-    ]
-    df[colname['HRA RSBI'][1]] = [
-        x.rsbi_3['GI'] for x in dynamic.objlist_result
-    ]
-    df[colname['HRA RSBI'][2]] = [
-        x.rsbi_3['SI'] for x in dynamic.objlist_result
-    ]
+    df = dynamic.df_new if dynamic.df_new.empty else FormProcess.FormPreProcess(
+    )
+
+    df[colname['patient ID']] = [x.pid for x in dynamic.linear_results]
+    df[colname['exTube end']] = [x.end for x in dynamic.linear_results]
+
+    df[colname['Average RR']] = [x.RR_1 for x in dynamic.linear_results]
+    df[colname['Average V_T']] = [x.V_T_1 for x in dynamic.linear_results]
+    df[colname['Average VE']] = [x.VE_1 for x in dynamic.linear_results]
+    df[colname['Average WOB']] = [x.wob_1 for x in dynamic.linear_results]
+    df[colname['Average RSBI']] = [x.rsbi_1 for x in dynamic.linear_results]
+    df[colname['Average MP(Jm)']] = [x.mp_jm_1 for x in dynamic.linear_results]
+    df[colname['Average MP(JL)']] = [x.mp_jl_1 for x in dynamic.linear_results]
+
+    df[colname['Standev RR']] = [x.RR_2 for x in dynamic.linear_results]
+    df[colname['Standev V_T']] = [x.V_T_2 for x in dynamic.linear_results]
+    df[colname['Standev VE']] = [x.VE_2 for x in dynamic.linear_results]
+    df[colname['Standev WOB']] = [x.wob_2 for x in dynamic.linear_results]
+    df[colname['Standev RSBI']] = [x.rsbi_2 for x in dynamic.linear_results]
+    df[colname['Standev MP(Jm)']] = [x.mp_jm_2 for x in dynamic.linear_results]
+    df[colname['Standev MP(JL)']] = [x.mp_jl_2 for x in dynamic.linear_results]
 
     filt_a = (df[colname['Average RR']] < 80) & (df[colname['Average RSBI']] <
                                                  400)
     filt_b = df[colname['Standev WOB']] < 40
-    filt_c = (df[colname['HRA RR'][2]] < 0.5) & (df[
-        colname['HRA RSBI'][2]] > -20000) & (df[colname['HRA VE'][2]] < 100000)
-
     dynamic.df_new = df.loc[filt_a & filt_b]
 
     FormProcess.CsvToLocal(dynamic.df_new, dynamic.save_form_loc,
-                           static.save_table_name['table result'])
+                           static.save_table_name['result linear'])
 
 
 @basic.measure
-def SaveGraphs():
+def NonlinearTableBuild():
 
     colname = static.result_name_map
+    df = dynamic.df_new if dynamic.df_new.empty else FormProcess.FormPreProcess(
+    )
 
-    draf = func.Draft(dynamic.save_graph_loc, dynamic.df_new)
-    draf.BoxPlot(colname['exTube end'], colname['Average RR'], 'rr_average')
-    draf.BoxPlot(colname['exTube end'], colname['Average V_T'], 'vt_average')
-    draf.BoxPlot(colname['exTube end'], colname['Average VE'], 've_average')
-    draf.BoxPlot(colname['exTube end'], colname['Average WOB'], 'wob_average')
-    draf.BoxPlot(colname['exTube end'], colname['Average RSBI'],
-                 'rsbi_average')
+    df[colname['patient ID']] = [x.pid for x in dynamic.nonlinear_results]
+    df[colname['exTube end']] = [x.end for x in dynamic.nonlinear_results]
 
-    draf.BoxPlot(colname['exTube end'], colname['Standev RR'], 'rr_standev')
-    draf.BoxPlot(colname['exTube end'], colname['Standev V_T'], 'vt_standev')
-    draf.BoxPlot(colname['exTube end'], colname['Standev VE'], 've_standev')
-    draf.BoxPlot(colname['exTube end'], colname['Standev WOB'], 'wob_standev')
-    draf.BoxPlot(colname['exTube end'], colname['Standev RSBI'],
-                 'rsbi_standev')
+    df[colname['HRA RR'][0]] = [
+        x.RR_3['PI'] for x in dynamic.nonlinear_results
+    ]
+    df[colname['HRA RR'][1]] = [
+        x.RR_3['GI'] for x in dynamic.nonlinear_results
+    ]
+    df[colname['HRA RR'][2]] = [
+        x.RR_3['SI'] for x in dynamic.nonlinear_results
+    ]
+    df[colname['HRA V_T'][0]] = [
+        x.V_T_3['PI'] for x in dynamic.nonlinear_results
+    ]
+    df[colname['HRA V_T'][1]] = [
+        x.V_T_3['GI'] for x in dynamic.nonlinear_results
+    ]
+    df[colname['HRA V_T'][2]] = [
+        x.V_T_3['SI'] for x in dynamic.nonlinear_results
+    ]
+    df[colname['HRA VE'][0]] = [
+        x.VE_3['PI'] for x in dynamic.nonlinear_results
+    ]
+    df[colname['HRA VE'][1]] = [
+        x.VE_3['GI'] for x in dynamic.nonlinear_results
+    ]
+    df[colname['HRA VE'][2]] = [
+        x.VE_3['SI'] for x in dynamic.nonlinear_results
+    ]
+    df[colname['HRA WOB'][0]] = [
+        x.wob_3['PI'] for x in dynamic.nonlinear_results
+    ]
+    df[colname['HRA WOB'][1]] = [
+        x.wob_3['GI'] for x in dynamic.nonlinear_results
+    ]
+    df[colname['HRA WOB'][2]] = [
+        x.wob_3['SI'] for x in dynamic.nonlinear_results
+    ]
+    df[colname['HRA RSBI'][0]] = [
+        x.rsbi_3['PI'] for x in dynamic.nonlinear_results
+    ]
+    df[colname['HRA RSBI'][1]] = [
+        x.rsbi_3['GI'] for x in dynamic.nonlinear_results
+    ]
+    df[colname['HRA RSBI'][2]] = [
+        x.rsbi_3['SI'] for x in dynamic.nonlinear_results
+    ]
 
-    draf.BoxPlotMulti(colname['exTube end'], colname['HRA RR'], 'rr_HRA')
-    draf.BoxPlotMulti(colname['exTube end'], colname['HRA V_T'], 'vt_HRA')
-    draf.BoxPlotMulti(colname['exTube end'], colname['HRA VE'], 've_HRA')
-    draf.BoxPlotMulti(colname['exTube end'], colname['HRA WOB'], 'wob_HRA')
-    draf.BoxPlotMulti(colname['exTube end'], colname['HRA RSBI'], 'rsbi_HRA')
+    dynamic.df_new = df
+
+    FormProcess.CsvToLocal(dynamic.df_new, dynamic.save_form_loc,
+                           static.save_table_name['result nonlinear'])
+
+
+@basic.measure
+def LinearGraph():
+
+    colname = static.result_name_map
+    loc = dynamic.save_graph_loc
+    df = dynamic.df_new
+
+    draf = func.Draft(loc, df).BoxPlot
+
+    targets_list = ['RR', 'V_T', 'VE', 'WOB', 'RSBI', 'MP(Jm)', 'MP(JL)']
+    targets_len = len(targets_list)
+    extube_colname_list = ['exTube end'] * targets_len
+    average_colname_list = [('Average ' + x) for x in targets_list]
+    standev_colname_list = [('Standev ' + x) for x in targets_list]
+    average_savename_list = [(x + '_average') for x in targets_list]
+    standev_savename_list = [(x + '_standev') for x in targets_list]
+
+    for i in range(targets_len):
+
+        draf(x_label=colname[extube_colname_list[i]],
+             y_label=colname[average_colname_list[i]],
+             fig_name=average_savename_list[i])
+
+        draf(x_label=colname[extube_colname_list[i]],
+             y_label=colname[standev_colname_list[i]],
+             fig_name=standev_savename_list[i])
+
+
+@basic.measure
+def NonlinearGraph():
+
+    colname = static.result_name_map
+    loc = dynamic.save_graph_loc
+    df = dynamic.df_new
+
+    draf = func.Draft(loc, df).BoxPlotMulti
+
+    targets_list = ['RR', 'V_T', 'VE', 'WOB', 'RSBI']
+    targets_len = len(targets_list)
+    extube_colname_list = ['exTube end'] * targets_len
+    hra_colname_list = [('HRA ' + x) for x in targets_list]
+    hra_savename_list = [(x + '_HRA') for x in targets_list]
+
+    filt_list = [
+        (df[colname['HRA RR'][1]] > 48) &
+        (df[colname['HRA RR'][1]] < 52) & (df[colname['HRA RR'][2]] < 0.5),
+        (df[colname['HRA V_T'][1]] < 55) & (df[colname['HRA V_T'][2]] < 50000)
+        & (df[colname['HRA V_T'][2]] > -50000),
+        (df[colname['HRA VE'][1]] < 52.5) &
+        (df[colname['HRA VE'][2]] < 100000),
+        (df[colname['HRA WOB'][1]] < 52) & (df[colname['HRA WOB'][2]] < 100000)
+        & (df[colname['HRA WOB'][2]] > -100000),
+        (df[colname['HRA RSBI'][1]] < 55) &
+        (df[colname['HRA RSBI'][2]] > -50000)
+    ]
+
+    for i in range(targets_len):
+
+        draf(x_label=colname[extube_colname_list[i]],
+             y_labels=colname[hra_colname_list[i]],
+             fig_name=hra_savename_list[i],
+             filt=filt_list[i])

@@ -170,7 +170,7 @@ class Calculation(RecordFucBasic):
         wob_b = abs(wob_angle - abs(np.trapz(self.__v_ex, self.__p_ex)) / 1000)
         wob = wob_a + wob_b
 
-        return round(wob, 2)
+        return [round(wob, 2), round(wob_a, 2), round(wob_b, 2)]
 
     def VE(self, rr, v_t):
         VE = rr * (v_t / 1000)
@@ -179,6 +179,11 @@ class Calculation(RecordFucBasic):
     def RSBI(self, rr, v_t):
         rsbi = rr / (v_t / 1000)
         return round(rsbi, 2)
+
+    def MP_Area(self, rr, v_t, wob_a):
+        mp_jm_area = 0.098 * rr * wob_a
+        mp_jl_area = 0.098 * wob_a / (v_t * 0.001)
+        return [round(mp_jm_area, 2), round(mp_jl_area, 2)]
 
 
 class Analysis(RecordFucBasic):
@@ -234,7 +239,7 @@ class Analysis(RecordFucBasic):
 
 
 class Draft(RecordFucBasic):
-    def __init__(self, save_loc, df):
+    def __init__(self, save_loc, df=None):
         super().__init__()
         self.__save_loc = save_loc
         self.__df = df
@@ -247,22 +252,37 @@ class Draft(RecordFucBasic):
         plt.savefig(saveloc)
         plt.close()
 
-    def BoxPlotMulti(self, x_label, y_labels, fig_name):
+    def BoxPlotMulti(self, x_label, y_labels, fig_name, filt):
         saveloc = Path(self.__save_loc) / (fig_name + '.png')
+        df = self.__df.loc[filt]
         sns.set_theme(style="whitegrid")
         sns.set(rc={'figure.figsize': (7.4, 3.3)})
         plt.subplot(1, 3, 1)
-        sns.boxplot(x=x_label, y=y_labels[0], data=self.__df,
+        sns.boxplot(x=x_label, y=y_labels[0], data=df,
                     order=[0, 1]).set_title(y_labels[0].split('_')[1])
         plt.subplot(1, 3, 2)
-        sns.boxplot(x=x_label, y=y_labels[1], data=self.__df,
+        sns.boxplot(x=x_label, y=y_labels[1], data=df,
                     order=[0, 1]).set_title(y_labels[1].split('_')[1])
         plt.subplot(1, 3, 3)
-        sns.boxplot(x=x_label, y=y_labels[2], data=self.__df,
+        sns.boxplot(x=x_label, y=y_labels[2], data=df,
                     order=[0, 1]).set_title(y_labels[2].split('_')[1])
         plt.tight_layout()
         plt.savefig(saveloc)
         plt.close()
+
+    def ScatterPlot(self, x_label, y_label, folder_name, fig_name, tag):
+        saveloc = Path(self.__save_loc) / folder_name / (fig_name + '.png')
+        sns.scatterplot(data=self.__df, x=x_label, y=y_label)
+        plt.title(fig_name + '__' + tag, fontsize=15)
+        plt.savefig(saveloc)
+        plt.close()
+
+    def VentWavePlots(self, s_F, s_P, s_V, save_name):
+
+        pass
+
+    def LinePlot(self):
+        pass
 
     def ViolinPlot(self, *args):
         pass
