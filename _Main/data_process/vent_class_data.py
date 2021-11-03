@@ -13,7 +13,7 @@ class DataStatic(DataBasic):
             },
             'save form': {
                 'category': 'ResultRoute',
-                'name': 'FormFolder_new'
+                'name': 'FormFolder'
             },
             'save graph': {
                 'category': 'ResultRoute',
@@ -46,11 +46,10 @@ class DataStatic(DataBasic):
             '30min sumP distri': 'Every30min_st_sumP',
             'result: 1h\'s sumP10+PSV filt': 'Records_1h_sumP10_PSV',
             'result: 1h\'s sumP12+PSV filt': 'Records_1h_sumP12_PSV',
+            'result: wh\'s invalid peep filt': 'Records_wh_InvalidPEEP',
             'table result filted': 'records_pro_1h_ExTube',
             'table result filted c': 'records_pro_1h_ExTube_c'
         }
-
-    pass
 
 
 class PIDGPObj(DataBasic):

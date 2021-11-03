@@ -8,6 +8,9 @@ class TableFuncBasic():
 
 
 class TableCobine(TableFuncBasic):
+    '''
+    func: get the 'ICU' from DF1 and conbine with DF2
+    '''
 
     __colname = ['PID', 'ICU', 'Record_t', 'endo_t']
 
@@ -24,12 +27,11 @@ class TableCobine(TableFuncBasic):
         for i in df_2.index:
 
             t_gap = timedelta(minutes=1)
-            t_filt = abs(df_1[self.__colname[2]] -
-                         df_2.loc[i, self.__colname[3]]) < t_gap
+            t_filt = abs(df_1.Record_t - df_2.endo_t[i]) < t_gap
             t_index = df_1.loc[t_filt].index
 
             for j in t_index:
-                icu_v = df_1.loc[j, self.__colname[1]]
+                icu_v = df_1.ICU[j]
                 if icu_v:
                     self.__icu.append(icu_v)
                     return
@@ -37,10 +39,10 @@ class TableCobine(TableFuncBasic):
 
     def Conbine(self):
 
-        gp_1 = self.__df_1.groupby(self.__colname[0])
-        gp_2 = self.__df_2.groupby(self.__colname[0])
+        gp_1 = self.__df_1.groupby(self.__df_1.PID)
+        gp_2 = self.__df_2.groupby(self.__df_2.PID)
 
-        for pid in self.__df_1[self.__colname[0]].unique():
+        for pid in self.__df_2.PID.unique():
 
             df_tmp_gp_1 = gp_1.get_group(pid)
             df_tmp_gp_2 = gp_2.get_group(pid)

@@ -20,7 +20,7 @@ class DataStatic(DataBasic):
             },
             'save_form': {
                 'category': 'ResultRoute',
-                'name': 'FormFolder_new'
+                'name': 'FormFolder'
             }
         }
 
@@ -57,10 +57,7 @@ class DataStatic(DataBasic):
             'peep + ps': 'st_sumP'
         }
 
-        self.save_table_name = {
-            'table result': 'record_check',
-            'table result c': 'record_check_c'
-        }
+        self.save_table_name = {'table result': 'record_check'}
 
 
 class DomainTable(DataBasic):

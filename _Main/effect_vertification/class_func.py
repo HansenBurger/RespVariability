@@ -186,6 +186,59 @@ class Calculation(RecordFucBasic):
         return [round(mp_jm_area, 2), round(mp_jl_area, 2)]
 
 
+class ParaValidity(RecordFucBasic):
+    def __init__(self, resp_obj):
+        super().__init__()
+        self.__obj = resp_obj
+        self.validity = True
+
+    def __ValRangeCheck(self, var, ran):
+        self.validity = True if round(var) in ran else False
+
+    def __RR_val(self):
+        rr = self.__obj.RR
+        val_range = range(0, 60)
+        self.__ValRangeCheck(rr, val_range)
+
+    def __VT_val(self):
+        vt_i = self.__obj.V_T_i
+        vt_e = self.__obj.V_T_e
+        val_range = range(0, 2000)
+        self.__ValRangeCheck(vt_i, val_range)
+        self.__ValRangeCheck(vt_e, val_range)
+
+    def __VE_val(self):
+        ve = self.__obj.VE
+        val_range = range(0, 30)
+        self.__ValRangeCheck(ve, val_range)
+
+    def __WOB_val(self):
+        wob_a = self.__obj.wob_a
+        wob_b = self.__obj.wob_b
+        val_range = range(0, 20)
+        self.__ValRangeCheck(wob_a, val_range)
+        self.__ValRangeCheck(wob_b, val_range)
+
+    def __MP_val(self):
+        mp_jm = self.__obj.mp_jm
+        mp_jl = self.__obj.mp_jl
+        val_range = range(0, 20)
+        self.__ValRangeCheck(mp_jm, val_range)
+        self.__ValRangeCheck(mp_jl, val_range)
+
+    def ValTotal(self, rr=True, vt=True, ve=True, wob=True, mp=True):
+        if rr:
+            self.__RR_val()
+        if vt:
+            self.__VT_val()
+        if ve:
+            self.__VE_val()
+        if wob:
+            self.__WOB_val()
+        if mp:
+            self.__MP_val()
+
+
 class Analysis(RecordFucBasic):
     def __init__(self):
         super().__init__()

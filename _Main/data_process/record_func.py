@@ -1,6 +1,7 @@
-import sys, pathlib, datetime
+import sys, pathlib
 import record_class_func as func
 import record_class_data as data
+from datetime import datetime
 
 sys.path.append(str(pathlib.Path.cwd().parents[1]))
 from Code import InIReaWri, FormProcess, PointProcess
@@ -10,12 +11,20 @@ static = data.DataStatic()
 dynamic = data.DataDynamic()
 
 
-def SaveLocGenerate():
-
+def SaveLocGenerate(module_name):
+    now = datetime.now()
+    folder_name = '{0}{1}{2}_{3}_{4}'.format(now.year,
+                                             str(now.month).rjust(2, '0'),
+                                             str(now.day).rjust(2, '0'),
+                                             str(now.hour).rjust(2, '0'),
+                                             module_name)
     save_info = static.file_loc_dict['save_form']
-    dynamic.save_loc = InIReaWri.ConfigR(type=save_info['category'],
-                                         name=save_info['name'],
-                                         conf=None)
+    save_form_loc = InIReaWri.ConfigR(type=save_info['category'],
+                                      name=save_info['name'],
+                                      conf=None)
+    save_form_loc = pathlib.Path(save_form_loc) / folder_name
+    save_form_loc.mkdir(parents=True, exist_ok=True)
+    dynamic.save_loc = str(save_form_loc)
 
 
 @basic.measure
@@ -78,7 +87,7 @@ def GetBinOutput():
     para = static.output_name_map
 
     for i in range(len(objlist_0)):
-        start_time = datetime.datetime.now()
+        start_time = datetime.now()
 
         ob0 = objlist_0[i]
         ob1 = objlist_1[i]
@@ -112,7 +121,7 @@ def GetBinOutput():
 
         ob1.mand_type = zpx_output[para['mand type']] if zpx_output else []
 
-        end_time = datetime.datetime.now()
+        end_time = datetime.now()
 
         print('process the {0} row consume {1} s'.format(
             str(ob0.row).rjust(4, '0'), (end_time - start_time).seconds))
@@ -141,7 +150,7 @@ def TableBuild():
     colname = static.result_name_map
     objlist_0 = dynamic.objlist_record
     objlist_1 = dynamic.objlist_result
-    save_form_loc = static.save_table_name['table result c']
+    save_form_loc = static.save_table_name['table result']
     df = dynamic.df
 
     df[colname['machine type']] = [obj.machine for obj in objlist_0]

@@ -2,7 +2,7 @@ import func
 
 
 def TableProcessing_RecordGeneration(switch=True):
-    func.SaveLocGenerate()
+    func.SaveLocGenerate('effection_sumP10')
     func.MainTableBuild() if switch else func.TestTableBuild()
     func.GenerateObjList()
     func.GenerateFileLoc()
@@ -11,6 +11,7 @@ def TableProcessing_RecordGeneration(switch=True):
 def RecordReading_RespCalculation():
     func.GetBinOutput()
     func.Calculate()
+    func.RespValidity()
 
 
 def Linear_Analysis_Preservation():

@@ -25,7 +25,7 @@ class DataStatic(TableDataBasic):
             },
             'save_form': {
                 'category': 'ResultRoute',
-                'name': 'FormFolder_new'
+                'name': 'FormFolder'
             }
         }
 

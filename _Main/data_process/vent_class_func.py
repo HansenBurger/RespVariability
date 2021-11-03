@@ -210,28 +210,53 @@ class TableQuery(FuncBasic):
         filt_1 = (series <= threshold[1]) & (series >= threshold[2])
         return {'sum_10': filt_0, 'sum_12': filt_1}
 
+    def __PeepFilter(self, series):
+        threshold = 10
+        series = series.dropna()
+        series = series.convert_dtypes()
+        series = series.astype('int32')
+        filt = series < threshold
+        return filt
+
     def TableFilt_PSV(self, colname_list):
         df = self.__df2
-        for i in colname_list:
-            filt = self.__PSVFilter(df[i])
+        for col in colname_list:
+            filt = self.__PSVFilter(df[col])
             df = df.loc[filt]
         self.__df2 = df
 
     def TableFilt_SumP(self, colname_list, filt_mode):
         df = self.__df2
-        for i in colname_list:
-            filt = self.__SumPressureFilter(df[i])[filt_mode]
+        for col in colname_list:
+            filt = self.__SumPressureFilter(df[col])[filt_mode]
             df = df.loc[filt]
         self.__df2 = df
 
-    def ConcatQueryByTime(self, col_pid, hour_set):
+    def TableFilt_InvalidPeep(self, colname_list):
+        df = self.__df2
+        threshold = 10
+        index_list = []
+        for i in df.index:
+            series = df.loc[i, colname_list]
+            list_ = [x for x in series.tolist() if x]
+            if all(int(value) >= threshold for value in list_):
+                index_list.append(i)
+        df = df.iloc[index_list]
+        self.__df2 = df
+
+    def ConcatQueryByTime(self, col_pid, hour_set=None):
         gp = pd.DataFrame.groupby(self.__df1, col_pid)
 
         for pid in self.__df2[col_pid].unique().tolist():
             df_tmp = gp.get_group(pid)
-            df_tmp_ = df_tmp.iloc[::-1][:hour_set]
-            if not df_tmp_.empty and df_tmp_.shape[0] == hour_set:
-                self.df = pd.concat([self.df, df_tmp_],
+            if hour_set:
+                df_tmp_ = df_tmp.iloc[::-1][:hour_set]
+                if not df_tmp_.empty and df_tmp_.shape[0] == hour_set:
+                    self.df = pd.concat([self.df, df_tmp_],
+                                        axis=0,
+                                        ignore_index=True)
+            else:
+                self.df = pd.concat([self.df, df_tmp],
                                     axis=0,
                                     ignore_index=True)
 

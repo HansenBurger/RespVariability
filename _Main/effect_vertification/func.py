@@ -1,4 +1,5 @@
 import sys, pathlib, datetime
+from time import process_time
 
 import class_func as func
 import class_data as data
@@ -13,17 +14,30 @@ static = data.DataStatic()
 dynamic = data.DataDynamic()
 
 
-def SaveLocGenerate():
+def SaveLocGenerate(module_name):
 
     form_info = static.file_loc_dict['save form']
     graph_info = static.file_loc_dict['save graph']
+    now = datetime.datetime.now()
+    folder_name = '{0}{1}{2}_{3}_{4}'.format(now.year,
+                                             str(now.month).rjust(2, '0'),
+                                             str(now.day).rjust(2, '0'),
+                                             str(now.hour).rjust(2, '0'),
+                                             module_name)
 
-    dynamic.save_form_loc = InIReaWri.ConfigR(type=form_info['category'],
-                                              name=form_info['name'],
-                                              conf=None)
-    dynamic.save_graph_loc = InIReaWri.ConfigR(type=graph_info['category'],
-                                               name=graph_info['name'],
-                                               conf=None)
+    save_form_loc = InIReaWri.ConfigR(type=form_info['category'],
+                                      name=form_info['name'],
+                                      conf=None)
+    save_form_loc = pathlib.Path(save_form_loc) / folder_name
+    save_form_loc.mkdir(parents=True, exist_ok=True)
+    dynamic.save_form_loc = str(save_form_loc)
+
+    save_graph_loc = InIReaWri.ConfigR(type=graph_info['category'],
+                                       name=graph_info['name'],
+                                       conf=None)
+    save_graph_loc = pathlib.Path(save_graph_loc) / folder_name
+    save_graph_loc.mkdir(parents=True, exist_ok=True)
+    dynamic.save_graph_loc = str(save_graph_loc)
 
 
 @basic.measure
@@ -190,6 +204,28 @@ def Calculate():
 
     dynamic.objlist_record = [i for i in objlist_1 if i]
     dynamic.objlist_table = [i for i in objlist_2 if i]
+
+
+@basic.measure
+def RespValidity():
+
+    objlist = dynamic.objlist_record
+
+    for obj in objlist:
+
+        resplist = obj.objlist_resp
+
+        for j in range(len(resplist)):
+
+            resp = resplist[j]
+            process = func.ParaValidity(resp)
+            process.ValTotal()
+            if not process.validity:
+                resp = None
+
+        obj.objlist_resp = [i for i in resplist if i]
+        a = obj.objlist_resp
+        pass
 
 
 @basic.measure
@@ -384,7 +420,7 @@ def LinearTableBuild():
     dynamic.df_new = df.loc[filt_a & filt_b]
 
     FormProcess.CsvToLocal(dynamic.df_new, dynamic.save_form_loc,
-                           static.save_table_name['result linear'])
+                           static.save_table_name['result: linear sumP10'])
 
 
 @basic.measure
@@ -453,10 +489,11 @@ def NonlinearTableBuild():
 def LinearGraph():
 
     colname = static.result_name_map
-    loc = dynamic.save_graph_loc
+    loc = pathlib.Path(dynamic.save_graph_loc) / 'Linear'
+    loc.mkdir(parents=True, exist_ok=True)
     df = dynamic.df_new
 
-    draf = func.Draft(loc, df).BoxPlot
+    draf = func.Draft(str(loc), df).BoxPlot
 
     targets_list = ['RR', 'V_T', 'VE', 'WOB', 'RSBI', 'MP(Jm)', 'MP(JL)']
     targets_len = len(targets_list)

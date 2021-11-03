@@ -1,5 +1,9 @@
-# ignore all file in .vscode/
-.vscode/
+# VSCode
+.vscode
+
+#Phpstorm
+.idea
+
 # ignore all file .json
 *.json
 */__pycache__

@@ -16,17 +16,24 @@ def SaveLocGenerate(module_name):
     form_info = static.file_loc_dict['save form']
     graph_info = static.file_loc_dict['save graph']
     now = datetime.now()
-    folder_name = '{0}\'{1}\'{2}_{3}_{4}'.format(now.year, now.month, now.day,
-                                                 now.hour, module_name)
+    folder_name = '{0}{1}{2}_{3}_{4}'.format(now.year,
+                                             str(now.month).rjust(2, '0'),
+                                             str(now.day).rjust(2, '0'),
+                                             str(now.hour).rjust(2, '0'),
+                                             module_name)
 
     save_form_loc = InIReaWri.ConfigR(type=form_info['category'],
                                       name=form_info['name'],
                                       conf=None)
+    save_form_loc = pathlib.Path(save_form_loc) / folder_name
+    save_form_loc.mkdir(parents=True, exist_ok=True)
+    dynamic.save_form_loc = save_form_loc
+
     save_graph_loc = InIReaWri.ConfigR(type=graph_info['category'],
                                        name=graph_info['name'],
                                        conf=None)
-    save_graph_loc = str(pathlib.Path(save_graph_loc) / folder_name)
-    dynamic.save_form_loc = save_form_loc
+    save_graph_loc = pathlib.Path(save_graph_loc) / folder_name
+    save_graph_loc.mkdir(parents=True, exist_ok=True)
     dynamic.save_graph_loc = save_graph_loc
 
 
@@ -148,7 +155,7 @@ def ResultBuild_PID():
     dynamic.df_basic = df
 
 
-def ResultBuild_Main(para_info, para_value_list, form_name):
+def __ResultBuild_Main(para_info, para_value_list, form_name):
 
     colname = static.table_col_map
     df_left = dynamic.df_basic
@@ -171,7 +178,7 @@ def ResultBuild_VM():
     para_info = ['mode', 'ST_VM']
     para_list = [obj.mode_list for obj in dynamic.objlist_pinfo]
     form_save_name = static.save_table_name['30min vm distri']
-    ResultBuild_Main(para_info, para_list, form_save_name)
+    __ResultBuild_Main(para_info, para_list, form_save_name)
 
 
 @basic.measure
@@ -180,7 +187,7 @@ def ResultBuild_ST_PEEP():
     para_info = ['peep', 'ST_PEEP']
     para_list = [obj.st_peep_list for obj in dynamic.objlist_pinfo]
     form_save_name = static.save_table_name['30min peep distri']
-    ResultBuild_Main(para_info, para_list, form_save_name)
+    __ResultBuild_Main(para_info, para_list, form_save_name)
 
 
 @basic.measure
@@ -189,7 +196,7 @@ def ResultBuild_ST_PS():
     para_info = ['ps', 'ST_PS']
     para_list = [obj.st_ps_list for obj in dynamic.objlist_pinfo]
     form_save_name = static.save_table_name['30min ps distri']
-    ResultBuild_Main(para_info, para_list, form_save_name)
+    __ResultBuild_Main(para_info, para_list, form_save_name)
 
 
 @basic.measure
@@ -198,40 +205,50 @@ def ResultBuild_ST_SUMP():
     para_info = ['sumP', 'ST_SUMP']
     para_list = [obj.st_sumP_list for obj in dynamic.objlist_pinfo]
     form_save_name = static.save_table_name['30min sumP distri']
-    ResultBuild_Main(para_info, para_list, form_save_name)
+    __ResultBuild_Main(para_info, para_list, form_save_name)
 
 
-@basic.measure
-def TableProcess_SumP10(hours):
-
+def __TableProcess_SumPMain(mode, hours, form_save_name):
     colname = static.table_col_map
     df_record = dynamic.df_main
     df_basic = dynamic.df_basic
     df_vent = dynamic.df_s_para['ST_VM']
     df_sumP = dynamic.df_s_para['ST_SUMP']
-    form_save_name = static.save_table_name['result: 1h\'s sumP10+PSV filt']
 
     process = func.TableQuery(df_record, [df_basic, df_vent, df_sumP])
     process.TableFilt_PSV(df_vent.columns[:(hours * 2 + 1)])
-    process.TableFilt_SumP(df_sumP.columns[:(hours * 2 + 1)], 'sum_10')
+    process.TableFilt_SumP(df_sumP.columns[:(hours * 2 + 1)], mode)
     process.ConcatQueryByTime(colname['patient ID'], hours)
 
     FormProcess.CsvToLocal(process.df, dynamic.save_form_loc, form_save_name)
 
 
 @basic.measure
-def TableProcess_SumP12(hours):
+def TableProcess_SumP10(hour_set):
 
+    filt_mode = 'sum_10'
+    form_save_name = static.save_table_name['result: 1h\'s sumP10+PSV filt']
+    __TableProcess_SumPMain(filt_mode, hour_set, form_save_name)
+
+
+@basic.measure
+def TableProcess_SumP12(hour_set):
+
+    filt_mode = 'sum_12'
+    form_save_name = static.save_table_name['result: 1h\'s sumP12+PSV filt']
+    __TableProcess_SumPMain(filt_mode, hour_set, form_save_name)
+
+
+@basic.measure
+def TbaleProcess_PEEPInvalid():
     colname = static.table_col_map
     df_record = dynamic.df_main
     df_basic = dynamic.df_basic
-    df_vent = dynamic.df_s_para['ST_VM']
-    df_sumP = dynamic.df_s_para['ST_SUMP']
-    form_save_name = static.save_table_name['result: 1h\'s sumP12+PSV filt']
+    df_peep = dynamic.df_s_para['ST_PEEP']
+    form_save_name = static.save_table_name['result: wh\'s invalid peep filt']
 
-    process = func.TableQuery(df_record, [df_basic, df_vent, df_sumP])
-    process.TableFilt_PSV(df_vent.columns[:(hours * 2 + 1)])
-    process.TableFilt_SumP(df_sumP.columns[:(hours * 2 + 1)], 'sum_12')
-    process.ConcatQueryByTime(colname['patient ID'], hours)
+    process = func.TableQuery(df_record, [df_basic, df_peep])
+    process.TableFilt_InvalidPeep(df_peep.columns)
+    process.ConcatQueryByTime(colname['patient ID'])
 
     FormProcess.CsvToLocal(process.df, dynamic.save_form_loc, form_save_name)

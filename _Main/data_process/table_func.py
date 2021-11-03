@@ -1,6 +1,7 @@
 import sys, pathlib
 import table_class_data as data
 import table_class_filt as func
+from datetime import datetime
 
 sys.path.append(str(pathlib.Path.cwd().parents[1]))
 from Code import InIReaWri, FormProcess
@@ -10,11 +11,21 @@ static = data.DataStatic()
 dynamic = data.DataDynamic()
 
 
-def SaveLocGenerate():
+def SaveLocGenerate(module_name):
     save_info = static.file_loc_dict['save_form']
-    dynamic.save_loc = InIReaWri.ConfigR(type=save_info['category'],
-                                         name=save_info['name'],
-                                         conf=None)
+    now = datetime.now()
+    folder_name = '{0}{1}{2}_{3}_{4}'.format(now.year,
+                                             str(now.month).rjust(2, '0'),
+                                             str(now.day).rjust(2, '0'),
+                                             str(now.hour).rjust(2, '0'),
+                                             module_name)
+
+    save_form_loc = InIReaWri.ConfigR(type=save_info['category'],
+                                      name=save_info['name'],
+                                      conf=None)
+    save_form_loc = pathlib.Path(save_form_loc) / folder_name
+    save_form_loc.mkdir(parents=True, exist_ok=True)
+    dynamic.save_loc = str(save_form_loc)
 
 
 @basic.measure
@@ -48,8 +59,7 @@ def DependTableBuild():
         col_map=depend_colmap,
         sort_jud=depend_info['sortcol'])
 
-    FormProcess.TimeShift(df=dynamic.depend_df,
-                          column_names=static.timecol_name)
+    FormProcess.TimeShift(dynamic.depend_df, static.timecol_name)
 
 
 @basic.measure
@@ -64,7 +74,7 @@ def ParaTableBuild():
                                                  col_map=para_colmap,
                                                  sort_jud=para_info['sortcol'])
 
-    FormProcess.TimeShift(df=dynamic.para_df, column_names=static.timecol_name)
+    FormProcess.TimeShift(dynamic.para_df, static.timecol_name)
 
 
 @basic.measure
@@ -84,35 +94,42 @@ def TableFilt():
 
 @basic.measure
 def TableSave():
+    save_loc = dynamic.save_loc
+    table_name = static.save_table_name
     func_build = func.TableBuild(dynamic.record_df, dynamic.depend_df,
                                  dynamic.result_dict)
 
     func_build.PidmissBuild()
-    FormProcess.PrintTableInfor(func_build.df, 'PID')
-    FormProcess.CsvToLocal(func_build.df, dynamic.save_loc,
-                           static.save_table_name['table filt ex1'])
+    df = func_build.df
+    FormProcess.PrintTableInfor(df, 'PID')
+    FormProcess.CsvToLocal(df, save_loc, table_name['table filt ex1'])
+    del df
 
     func_build.TimemissBuild()
-    FormProcess.PrintTableInfor(func_build.df, 'PID')
-    FormProcess.CsvToLocal(func_build.df, dynamic.save_loc,
-                           static.save_table_name['table filt ex2'])
+    df = func_build.df
+    FormProcess.PrintTableInfor(df, 'PID')
+    FormProcess.CsvToLocal(df, save_loc, table_name['table filt ex2'])
+    del df
 
     func_build.FiltedDataBuild()
-    dynamic.filt_df = func_build.df
-    FormProcess.PrintTableInfor(func_build.df, 'PID')
-    FormProcess.CsvToLocal(func_build.df, dynamic.save_loc,
-                           static.save_table_name['table filt in'])
+    df = func_build.df
+    FormProcess.PrintTableInfor(df, 'PID')
+    FormProcess.CsvToLocal(df, save_loc, table_name['table filt in'])
+    dynamic.filt_df = df
+    del df
 
 
 @basic.measure
 def TableProcess():
+    save_loc = dynamic.save_loc
+    table_name = static.save_table_name
     func_process = func.TableProcess(dynamic.filt_df, static.col_name)
 
     func_process.ValidProcess()  # Save to config.ini
-    FormProcess.PrintTableInfor(func_process.df, 'PID')
-    FormProcess.CsvToLocal(func_process.df, dynamic.save_loc,
-                           static.save_table_name['table valid'])
+    df = func_process.df
+    FormProcess.PrintTableInfor(df, 'PID')
+    FormProcess.CsvToLocal(df, save_loc, table_name['table valid'])
 
     func_process.inValidProcess()
-    FormProcess.CsvToLocal(func_process.df, dynamic.save_loc,
-                           static.save_table_name['table invalid'])
+    df = func_process.df
+    FormProcess.CsvToLocal(df, save_loc, table_name['table invalid'])

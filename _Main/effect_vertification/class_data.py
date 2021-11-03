@@ -18,7 +18,7 @@ class DataStatic(DataBasic):
             },
             'save form': {
                 'category': 'ResultRoute',
-                'name': 'FormFolder_new'
+                'name': 'FormFolder'
             },
             'save graph': {
                 'category': 'ResultRoute',
@@ -74,7 +74,8 @@ class DataStatic(DataBasic):
         }
 
         self.save_table_name = {
-            'result linear': 'Pro_1h_ExTube_linear',
+            'result: linear sumP10': 'Records_1h_sumP10_PSV_linear',
+            'result: linear sumP12': 'Records_1h_sumP12_PSV_linear',
             'result nonlinear': 'Pro_1h_ExTube_nonlinear'
         }
 

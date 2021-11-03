@@ -40,5 +40,3 @@ def InfoSave(file_loc, content):
     f = open(file_loc, "w")
     f.write(content)
     f.close()
-
-    pass
