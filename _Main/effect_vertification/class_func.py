@@ -1,6 +1,7 @@
 from pathlib import Path, PurePath
 import numpy as np
 import matplotlib.pyplot as plt
+from numpy.core.records import array
 import seaborn as sns
 
 
@@ -272,6 +273,14 @@ class Analysis(RecordFucBasic):
         si = 100 * theta_1 / (theta_1 + theta_2)
         return round(si, 2)
 
+    def __SD1(self, a_0, a_1):
+        sd = np.std(a_1 - a_0) / np.sqrt(2)
+        return round(sd, 2)
+
+    def __SD2(self, a_0, a_1):
+        sd = np.std(a_1 + a_0) / np.sqrt(2)
+        return round(sd, 2)
+
     def Mean(self, list_):
         array_ = np.array(list_)
         result = np.mean(array_)
@@ -282,13 +291,30 @@ class Analysis(RecordFucBasic):
         result = np.std(array_)
         return round(result, 2)
 
-    def HRA(self, list_):
+    def HRA(self, list_, method_sub):
         array_0 = np.array(list_[:len(list_) - 1])
         array_1 = np.array(list_[1:])
-        pi = self.__PI(array_0, array_1)
-        gi = self.__GI(array_0, array_1)
-        si = self.__SI(array_0, array_1)
-        return {'PI': pi, 'GI': gi, 'SI': si}
+
+        if method_sub == 'PI':
+            pi = self.__PI(array_0, array_1)
+            return pi
+        if method_sub == 'GI':
+            gi = self.__GI(array_0, array_1)
+            return gi
+        if method_sub == 'SI':
+            si = self.__SI(array_0, array_1)
+            return si
+
+    def HRV(self, list_, method_sub):
+        array_0 = np.array(list_[:len(list_) - 1])
+        array_1 = np.array(list_[1:])
+
+        if method_sub == 'SD1':
+            sd1 = self.__SD1(array_0, array_1)
+            return sd1
+        if method_sub == 'SD2':
+            sd2 = self.__SD2(array_0, array_1)
+            return sd2
 
 
 class Draft(RecordFucBasic):
@@ -305,26 +331,25 @@ class Draft(RecordFucBasic):
         plt.savefig(saveloc)
         plt.close()
 
-    def BoxPlotMulti(self, x_label, y_labels, fig_name, filt):
+    def BoxPlotMulti(self, x_label, y_labels, fig_name, filt=None):
         saveloc = Path(self.__save_loc) / (fig_name + '.png')
-        df = self.__df.loc[filt]
+        #df = self.__df[filt] if not filt.empty else self.__df
+        df = self.__df
+        multi_size = len(y_labels)
         sns.set_theme(style="whitegrid")
-        sns.set(rc={'figure.figsize': (7.4, 3.3)})
-        plt.subplot(1, 3, 1)
-        sns.boxplot(x=x_label, y=y_labels[0], data=df,
-                    order=[0, 1]).set_title(y_labels[0].split('_')[1])
-        plt.subplot(1, 3, 2)
-        sns.boxplot(x=x_label, y=y_labels[1], data=df,
-                    order=[0, 1]).set_title(y_labels[1].split('_')[1])
-        plt.subplot(1, 3, 3)
-        sns.boxplot(x=x_label, y=y_labels[2], data=df,
-                    order=[0, 1]).set_title(y_labels[2].split('_')[1])
+        sns.set(rc={'figure.figsize': (3.4 * multi_size, 4)})
+        for i in range(multi_size):
+            plt.subplot(1, multi_size, i + 1)
+            sns.boxplot(x=x_label, y=y_labels[i], data=df,
+                        order=[0, 1]).set_title(y_labels[i].split('_')[1])
         plt.tight_layout()
         plt.savefig(saveloc)
         plt.close()
 
     def ScatterPlot(self, x_label, y_label, folder_name, fig_name, tag):
-        saveloc = Path(self.__save_loc) / folder_name / (fig_name + '.png')
+        save_folder = Path(self.__save_loc) / folder_name
+        save_folder.mkdir(parents=True, exist_ok=True)
+        saveloc = save_folder / (fig_name + '.png')
         sns.scatterplot(data=self.__df, x=x_label, y=y_label)
         plt.title(fig_name + '__' + tag, fontsize=15)
         plt.savefig(saveloc)

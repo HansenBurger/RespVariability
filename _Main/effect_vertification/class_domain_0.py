@@ -80,6 +80,7 @@ class DomainRecord(DomainBasic):
         self.__obj_average = None
         self.__obj_standev = None
         self.__obj_hra = None
+        self.__obj_hrv = None
 
     @property
     def zif_loc(self):
@@ -201,32 +202,22 @@ class DomainRecord(DomainBasic):
     def obj_hra(self, v):
         self.__obj_hra = v
 
+    @property
+    def obj_hrv(self):
+        return self.__obj_hrv
 
-class DomainAggregate(DomainBasic):
+    @obj_hrv.setter
+    def obj_hrv(self, v):
+        self.__obj_hrv = v
+
+
+class DomainAggr_Time(DomainBasic):
     def __init__(self):
         super().__init__()
         self.__pid = ''
         self.__end = 0
-        self.__resp = None
-        self.__RR_1 = 0
-        self.__V_T_1 = 0
-        self.__VE_1 = 0
-        self.__wob_1 = 0
-        self.__rsbi_1 = 0
-        self.__mp_jm_1 = 0
-        self.__mp_jl_1 = 0
-        self.__RR_2 = 0
-        self.__V_T_2 = 0
-        self.__VE_2 = 0
-        self.__wob_2 = 0
-        self.__rsbi_2 = 0
-        self.__mp_jm_2 = 0
-        self.__mp_jl_2 = 0
-        self.__RR_3 = {}
-        self.__V_T_3 = {}
-        self.__VE_3 = {}
-        self.__wob_3 = {}
-        self.__rsbi_3 = {}
+        self.__ave = None
+        self.__std = None
 
     @property
     def pid(self):
@@ -245,161 +236,108 @@ class DomainAggregate(DomainBasic):
         self.__end = v
 
     @property
-    def resp(self):
-        return self.__resp
+    def ave(self):
+        return self.__ave
 
-    @resp.setter
-    def resp(self, v):
-        self.__resp = v
-
-    @property
-    def RR_1(self):
-        return self.__RR_1
-
-    @RR_1.setter
-    def RR_1(self, v):
-        self.__RR_1 = v
+    @ave.setter
+    def ave(self, v):
+        self.__ave = v
 
     @property
-    def V_T_1(self):
-        return self.__V_T_1
+    def std(self):
+        return self.__std
 
-    @V_T_1.setter
-    def V_T_1(self, v):
-        self.__V_T_1 = v
+    @std.setter
+    def std(self, v):
+        self.__std = v
 
-    @property
-    def VE_1(self):
-        return self.__VE_1
 
-    @VE_1.setter
-    def VE_1(self, v):
-        self.__VE_1 = v
-
-    @property
-    def wob_1(self):
-        return self.__wob_1
-
-    @wob_1.setter
-    def wob_1(self, v):
-        self.__wob_1 = v
+class DomainAggr_Freq(DomainBasic):
+    def __init__(self):
+        super().__init__()
+        self.__pid = ''
+        self.__end = 0
 
     @property
-    def rsbi_1(self):
-        return self.__rsbi_1
+    def pid(self):
+        return self.__pid
 
-    @rsbi_1.setter
-    def rsbi_1(self, v):
-        self.__rsbi_1 = v
-
-    @property
-    def mp_jm_1(self):
-        return self.__mp_jm_1
-
-    @mp_jm_1.setter
-    def mp_jm_1(self, v):
-        self.__mp_jm_1 = v
+    @pid.setter
+    def pid(self, v):
+        self.__pid = v
 
     @property
-    def mp_jl_1(self):
-        return self.__mp_jl_1
+    def end(self):
+        return self.__end
 
-    @mp_jl_1.setter
-    def mp_jl_1(self, v):
-        self.__mp_jl_1 = v
+    @end.setter
+    def end(self, v):
+        self.__end = v
 
-    @property
-    def RR_2(self):
-        return self.__RR_2
 
-    @RR_2.setter
-    def RR_2(self, v):
-        self.__RR_2 = v
-
-    @property
-    def V_T_2(self):
-        return self.__V_T_2
-
-    @V_T_2.setter
-    def V_T_2(self, v):
-        self.__V_T_2 = v
+class DomainAggr_NonL(DomainBasic):
+    def __init__(self):
+        super().__init__()
+        self.__pid = ''
+        self.__end = 0
+        self.__hra_pi = None
+        self.__hra_gi = None
+        self.__hra_si = None
+        self.__hrv_sd1 = None
+        self.__hrv_sd2 = None
 
     @property
-    def VE_2(self):
-        return self.__VE_2
+    def pid(self):
+        return self.__pid
 
-    @VE_2.setter
-    def VE_2(self, v):
-        self.__VE_2 = v
-
-    @property
-    def wob_2(self):
-        return self.__wob_2
-
-    @wob_2.setter
-    def wob_2(self, v):
-        self.__wob_2 = v
+    @pid.setter
+    def pid(self, v):
+        self.__pid = v
 
     @property
-    def rsbi_2(self):
-        return self.__rsbi_2
+    def end(self):
+        return self.__end
 
-    @rsbi_2.setter
-    def rsbi_2(self, v):
-        self.__rsbi_2 = v
-
-    @property
-    def mp_jm_2(self):
-        return self.__mp_jm_2
-
-    @mp_jm_2.setter
-    def mp_jm_2(self, v):
-        self.__mp_jm_2 = v
+    @end.setter
+    def end(self, v):
+        self.__end = v
 
     @property
-    def mp_jl_2(self):
-        return self.__mp_jl_2
+    def hra_pi(self):
+        return self.__hra_pi
 
-    @mp_jl_2.setter
-    def mp_jl_2(self, v):
-        self.__mp_jl_2 = v
-
-    @property
-    def RR_3(self):
-        return self.__RR_3
-
-    @RR_3.setter
-    def RR_3(self, dict_):
-        self.__RR_3 = dict_
+    @hra_pi.setter
+    def hra_pi(self, v):
+        self.__hra_pi = v
 
     @property
-    def V_T_3(self):
-        return self.__V_T_3
+    def hra_gi(self):
+        return self.__hra_gi
 
-    @V_T_3.setter
-    def V_T_3(self, dict_):
-        self.__V_T_3 = dict_
-
-    @property
-    def VE_3(self):
-        return self.__VE_3
-
-    @VE_3.setter
-    def VE_3(self, dict_):
-        self.__VE_3 = dict_
+    @hra_gi.setter
+    def hra_gi(self, v):
+        self.__hra_gi = v
 
     @property
-    def wob_3(self):
-        return self.__wob_3
+    def hra_si(self):
+        return self.__hra_si
 
-    @wob_3.setter
-    def wob_3(self, dict_):
-        self.__wob_3 = dict_
+    @hra_si.setter
+    def hra_si(self, v):
+        self.__hra_si = v
 
     @property
-    def rsbi_3(self):
-        return self.__rsbi_3
+    def hrv_sd1(self):
+        return self.__hrv_sd1
 
-    @rsbi_3.setter
-    def rsbi_3(self, dict_):
-        self.__rsbi_3 = dict_
+    @hrv_sd1.setter
+    def hrv_sd1(self, v):
+        self.__hrv_sd1 = v
+
+    @property
+    def hrv_sd2(self):
+        return self.__hrv_sd2
+
+    @hrv_sd2.setter
+    def hrv_sd2(self, v):
+        self.__hrv_sd2 = v

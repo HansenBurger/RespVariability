@@ -36,6 +36,7 @@ class DataStatic(DataBasic):
             'vent m end': 'vent_m_2',
             'PEEP setting': 'st_peep',
             'PS setting': 'st_ps',
+            'ESENS setting': 'st_e_sens',
             'PEEP + PS': 'st_sumP'
         }
 
@@ -44,6 +45,8 @@ class DataStatic(DataBasic):
             '30min peep distri': 'Every30min_st_peep',
             '30min ps distri': 'Every30min_st_ps',
             '30min sumP distri': 'Every30min_st_sumP',
+            '30min esens distri': 'Every30min_st_e_sens',
+            'result: 1h\'s PSV filt': 'Records_1h_PSV',
             'result: 1h\'s sumP10+PSV filt': 'Records_1h_sumP10_PSV',
             'result: 1h\'s sumP12+PSV filt': 'Records_1h_sumP12_PSV',
             'result: wh\'s invalid peep filt': 'Records_wh_InvalidPEEP',
@@ -68,6 +71,7 @@ class PIDGPObj(DataBasic):
         self.__vtm_2_s = []
         self.__st_peep_s = []
         self.__st_ps_s = []
+        self.__st_e_sens_s = []
         self.__st_sumP_s = []
 
     @property
@@ -191,6 +195,14 @@ class PIDGPObj(DataBasic):
         self.__st_ps_s = series
 
     @property
+    def st_e_sens_s(self):
+        return self.__st_e_sens_s
+
+    @st_e_sens_s.setter
+    def st_e_sens_s(self, series):
+        self.__st_e_sens_s = series
+
+    @property
     def st_sumP_s(self):
         return self.__st_sumP_s
 
@@ -210,6 +222,7 @@ class PIDInfoObj(DataBasic):
         self.__mode_list = []
         self.__st_peep_list = []
         self.__st_ps_list = []
+        self.__st_e_sens_list = []
         self.__st_sumP_list = []
 
     @property
@@ -275,6 +288,14 @@ class PIDInfoObj(DataBasic):
     @st_ps_list.setter
     def st_ps_list(self, list_):
         self.__st_ps_list = list_
+
+    @property
+    def st_e_sens_list(self):
+        return self.__st_e_sens_list
+
+    @st_e_sens_list.setter
+    def st_e_sens_list(self, list_):
+        self.__st_e_sens_list = list_
 
     @property
     def st_sumP_list(self):

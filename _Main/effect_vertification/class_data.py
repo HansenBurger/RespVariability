@@ -66,17 +66,26 @@ class DataStatic(DataBasic):
             'Standev RSBI': 'RSBI_2',
             'Standev MP(Jm)': 'MP_jm_2',
             'Standev MP(JL)': 'MP_jl_2',
+            'HRV RR': ['RR_SD1', 'RR_SD2'],
+            'HRV V_T': ['VT_SD1', 'VT_SD2'],
+            'HRV VE': ['VE_SD1', 'VE_SD2'],
+            'HRV WOB': ['WOB_SD1', 'WOB_SD2'],
+            'HRV RSBI': ['RSBI_SD1', 'RSBI_SD2'],
+            'HRV MP(JL)': ['MPJL_SD1', 'MPJL_SD2'],
+            'HRV MP(Jm)': ['MPJm_SD1', 'MPJm_SD2'],
             'HRA RR': ['RR_PI', 'RR_GI', 'RR_SI'],
-            'HRA V_T': ['V_T_PI', 'V_T_GI', 'V_T_SI'],
+            'HRA V_T': ['VT_PI', 'VT_GI', 'VT_SI'],
             'HRA VE': ['VE_PI', 'VE_GI', 'VE_SI'],
             'HRA WOB': ['WOB_PI', 'WOB_GI', 'WOB_SI'],
             'HRA RSBI': ['RSBI_PI', 'RSBI_GI', 'RSBI_SI'],
+            'HRA MP(JL)': ['MPJL_PI', 'MPJL_GI', 'MPJL_SI'],
+            'HRA MP(Jm)': ['MPJm_PI', 'MPJm_GI', 'MPJm_SI'],
         }
 
         self.save_table_name = {
             'result: linear sumP10': 'Records_1h_sumP10_PSV_linear',
             'result: linear sumP12': 'Records_1h_sumP12_PSV_linear',
-            'result nonlinear': 'Pro_1h_ExTube_nonlinear'
+            'result: nonlinear sumP12': 'Records_1h_sumP12_PSV_nonlinear'
         }
 
 
@@ -89,8 +98,9 @@ class DataDynamic(DataBasic):
         self.__save_graph_loc = ''
         self.__objlist_table = []
         self.__objlist_record = []
-        self.__linear_results = []
-        self.__nonlinear_results = []
+        self.__time_results = []
+        self.__freq_results = []
+        self.__nonl_results = []
 
     @property
     def df(self):
@@ -141,17 +151,25 @@ class DataDynamic(DataBasic):
         self.__objlist_record = list_
 
     @property
-    def linear_results(self):
-        return self.__linear_results
+    def time_results(self):
+        return self.__time_results
 
-    @linear_results.setter
-    def linear_results(self, list_):
-        self.__linear_results = list_
+    @time_results.setter
+    def time_results(self, list_):
+        self.__time_results = list_
 
     @property
-    def nonlinear_results(self):
-        return self.__nonlinear_results
+    def freq_results(self):
+        return self.__freq_results
 
-    @nonlinear_results.setter
-    def nonlinear_results(self, list_):
-        self.__nonlinear_results = list_
+    @freq_results.setter
+    def freq_results(self, list_):
+        self.__freq_results = list_
+
+    @property
+    def nonl_results(self):
+        return self.__nonl_results
+
+    @nonl_results.setter
+    def nonl_results(self, list_):
+        self.__nonl_results = list_

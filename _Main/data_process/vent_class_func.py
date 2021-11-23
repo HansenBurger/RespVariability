@@ -109,6 +109,8 @@ class Transmit(FuncBasic):
         self.__obj2.st_peep_list = self.__ExtractSetting(self.__obj1.st_peep_s)
         self.__obj2.st_ps_list = self.__ExtractSetting(self.__obj1.st_ps_s)
         self.__obj2.st_sumP_list = self.__ExtractSetting(self.__obj1.st_sumP_s)
+        self.__obj2.st_e_sens_list = self.__ExtractSetting(
+            self.__obj1.st_e_sens_s)
 
 
 class Charts():

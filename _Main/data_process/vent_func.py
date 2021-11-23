@@ -74,6 +74,7 @@ def TableRead_GP():
         obj.vtm_2_s = df_tmp[colname['vent m end']]
         obj.st_peep_s = df_tmp[colname['PEEP setting']]
         obj.st_ps_s = df_tmp[colname['PS setting']]
+        obj.st_e_sens_s = df_tmp[colname['ESENS setting']]
         obj.st_sumP_s = df_tmp[colname['PEEP + PS']]
 
         dynamic.objlist_table.append(obj)
@@ -110,6 +111,7 @@ def RecordValidate_GP():
             objlist[i].vtm_2_s = df_tmp[colname['vent m end']]
             objlist[i].st_peep_s = df_tmp[colname['PEEP setting']]
             objlist[i].st_ps_s = df_tmp[colname['PS setting']]
+            objlist[i].st_e_sens_s = df_tmp[colname['ESENS setting']]
             objlist[i].st_sumP_s = df_tmp[colname['PEEP + PS']]
 
     dynamic.objlist_table = [i for i in objlist if i]
@@ -127,7 +129,6 @@ def CombineRecordsToPinfo():
         process.TransmitValue_Basic()
         process.TransmitValue_VM()
         process.TransmitValue_ST()
-
         dynamic.objlist_pinfo.append(obj_pinfo)
         del obj_pinfo, process
 
@@ -138,6 +139,7 @@ def CombineRecordsToPinfo():
         i.st_peep_list += [None] * (max_len - len(i.st_peep_list))
         i.st_ps_list += [None] * (max_len - len(i.st_ps_list))
         i.st_sumP_list += [None] * (max_len - len(i.st_sumP_list))
+        i.st_e_sens_list += [None] * (max_len - len(i.st_e_sens_list))
 
 
 def ResultBuild_PID():
@@ -200,6 +202,15 @@ def ResultBuild_ST_PS():
 
 
 @basic.measure
+def ResultBuild_ST_E_SENS():
+
+    para_info = ['esens', 'ST_E_SENS']
+    para_list = [obj.st_e_sens_list for obj in dynamic.objlist_pinfo]
+    form_save_name = static.save_table_name['30min esens distri']
+    __ResultBuild_Main(para_info, para_list, form_save_name)
+
+
+@basic.measure
 def ResultBuild_ST_SUMP():
 
     para_info = ['sumP', 'ST_SUMP']
@@ -208,7 +219,7 @@ def ResultBuild_ST_SUMP():
     __ResultBuild_Main(para_info, para_list, form_save_name)
 
 
-def __TableProcess_SumPMain(mode, hours, form_save_name):
+def __TableProcess_SumPMain(mode, hours):
     colname = static.table_col_map
     df_record = dynamic.df_main
     df_basic = dynamic.df_basic
@@ -220,7 +231,7 @@ def __TableProcess_SumPMain(mode, hours, form_save_name):
     process.TableFilt_SumP(df_sumP.columns[:(hours * 2 + 1)], mode)
     process.ConcatQueryByTime(colname['patient ID'], hours)
 
-    FormProcess.CsvToLocal(process.df, dynamic.save_form_loc, form_save_name)
+    return process.df
 
 
 @basic.measure
@@ -228,7 +239,8 @@ def TableProcess_SumP10(hour_set):
 
     filt_mode = 'sum_10'
     form_save_name = static.save_table_name['result: 1h\'s sumP10+PSV filt']
-    __TableProcess_SumPMain(filt_mode, hour_set, form_save_name)
+    result_df = __TableProcess_SumPMain(filt_mode, hour_set)
+    FormProcess.CsvToLocal(result_df, dynamic.save_form_loc, form_save_name)
 
 
 @basic.measure
@@ -236,7 +248,22 @@ def TableProcess_SumP12(hour_set):
 
     filt_mode = 'sum_12'
     form_save_name = static.save_table_name['result: 1h\'s sumP12+PSV filt']
-    __TableProcess_SumPMain(filt_mode, hour_set, form_save_name)
+    result_df = __TableProcess_SumPMain(filt_mode, hour_set)
+    FormProcess.CsvToLocal(result_df, dynamic.save_form_loc, form_save_name)
+
+
+@basic.measure
+def TableProcess_PSV(hour_set):
+    colname = static.table_col_map
+    df_record = dynamic.df_main
+    df_basic = dynamic.df_basic
+    df_vent = dynamic.df_s_para['ST_VM']
+    form_save_name = static.save_table_name['result: 1h\'s PSV filt']
+
+    process = func.TableQuery(df_record, [df_basic, df_vent])
+    process.TableFilt_PSV(df_vent.columns[:(hour_set * 2 + 1)])
+    process.ConcatQueryByTime(colname['patient ID'], hour_set)
+    FormProcess.CsvToLocal(process.df, dynamic.save_form_loc, form_save_name)
 
 
 @basic.measure

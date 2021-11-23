@@ -234,51 +234,88 @@ class DomainStanDev(DomainBasic):
         self.__mp_jl = v
 
 
+class DomainTS(DomainBasic):
+    def __init__(self):
+        super().__init__()
+        self.__ave = None
+        self.__std = None
+        self.__cv = None
+
+    @property
+    def ave(self):
+        return self.__ave
+
+    @ave.setter
+    def ave(self, obj):
+        self.__ave = obj
+
+    @property
+    def std(self):
+        return self.__std
+
+    @std.setter
+    def std(self, obj):
+        self.__std = obj
+
+    @property
+    def cv(self):
+        return self.__cv
+
+    @cv.setter
+    def cv(self, obj):
+        self.__cv = obj
+
+
 class DomainHRA(DomainBasic):
     def __init__(self):
         super().__init__()
-        self.__RR_s = {}
-        self.__V_T_s = {}
-        self.__VE_s = {}
-        self.__wob_s = {}
-        self.__rsbi_s = {}
+        self.__pi = None
+        self.__gi = None
+        self.__si = None
 
     @property
-    def RR_s(self):
-        return self.__RR_s
+    def pi(self):
+        return self.__pi
 
-    @RR_s.setter
-    def RR_s(self, dict_):
-        self.__RR_s = dict_
-
-    @property
-    def V_T_s(self):
-        return self.__V_T_s
-
-    @V_T_s.setter
-    def V_T_s(self, dict_):
-        self.__V_T_s = dict_
+    @pi.setter
+    def pi(self, obj):
+        self.__pi = obj
 
     @property
-    def VE_s(self):
-        return self.__VE_s
+    def gi(self):
+        return self.__gi
 
-    @VE_s.setter
-    def VE_s(self, dict_):
-        self.__VE_s = dict_
-
-    @property
-    def wob_s(self):
-        return self.__wob_s
-
-    @wob_s.setter
-    def wob_s(self, dict_):
-        self.__wob_s = dict_
+    @gi.setter
+    def gi(self, obj):
+        self.__gi = obj
 
     @property
-    def rsbi_s(self):
-        return self.__rsbi_s
+    def si(self):
+        return self.__si
 
-    @rsbi_s.setter
-    def rsbi_s(self, dict_):
-        self.__rsbi_s = dict_
+    @si.setter
+    def si(self, obj):
+        self.__si = obj
+
+
+class DomainHRV(DomainBasic):
+    def __init__(self):
+        super().__init__()
+        self.__sd1 = None
+        self.__sd2 = None
+
+    @property
+    def sd1(self):
+        return self.__sd1
+
+    @sd1.setter
+    def sd1(self, obj):
+        self.__sd1 = obj
+
+    @property
+    def sd2(self):
+        return self.__sd2
+
+    @sd2.setter
+    def sd2(self, obj):
+        self.__sd2 = obj

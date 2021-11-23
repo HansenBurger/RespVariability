@@ -100,10 +100,11 @@ class Calculation(RecordFucBasic):
         para_index = self.__obj_0.para_ind * np.array(
             1 / self.__obj_0.sample_rate)
         para_select_indexs = self.__LocatSimiTerms(para_index, self.__time_tag)
+        machine = self.__obj_0.machine
+        machine_name = machine.split('-')[0]
 
         for i in para_select_indexs:
-            vent_mode = func(self.__obj_0.machine,
-                             self.__obj_0.vent_type[i].item(),
+            vent_mode = func(machine_name, self.__obj_0.vent_type[i].item(),
                              self.__obj_0.vent_mode[i].item(),
                              self.__obj_0.mand_type[i].item())
 

@@ -50,6 +50,7 @@ def DataChecker():
     func_2.GetBinOutput()
     func_2.ResultGenerate()
     func_2.TableBuild()
+    func_2.TableProcess()
 
 
 def StProcessor():
@@ -74,6 +75,8 @@ def StProcessor():
     func_3.ResultBuild_ST_PEEP()
     func_3.ResultBuild_ST_PS()
     func_3.ResultBuild_ST_SUMP()
+    func_3.ResultBuild_ST_E_SENS()
+    func_3.TableProcess_PSV(1)
     func_3.TableProcess_SumP10(1)
     func_3.TableProcess_SumP12(1)
     func_3.TbaleProcess_PEEPInvalid()
@@ -83,7 +86,7 @@ def main():
     print('I am the storm that is approooooaching !')
     TableFilter
     DataChecker
-    StProcessor
+    StProcessor()
 
 
 if __name__ == '__main__':

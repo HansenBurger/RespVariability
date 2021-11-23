@@ -42,11 +42,13 @@ class DataStatic(DataBasic):
             'mand type': 'st_MAND_TYPE',
             'PEEP setting': 'st_PEEP',
             'PS setting': 'st_P_SUPP',
+            'ESENS setting': 'st_E_SENS',
             'start index': 0,
             'flow index': 2
         }
 
         self.result_name_map = {
+            'ICU': 'ICU',
             'machine type': 'machine',
             'vent m bin': 'vent_m_0',
             'vent m mid': 'vent_m_1',
@@ -54,10 +56,14 @@ class DataStatic(DataBasic):
             'still time': 'vent_t',
             'peep setting': 'st_peep',
             'ps setting': 'st_ps',
+            'esens setting': 'st_e_sens',
             'peep + ps': 'st_sumP'
         }
 
-        self.save_table_name = {'table result': 'record_check'}
+        self.save_table_name = {
+            'result full': 'record_check_f',
+            'result shrink': 'record_check_s'
+        }
 
 
 class DomainTable(DataBasic):
@@ -139,6 +145,7 @@ class DomainRecord(DataBasic):
         self.__para_ind = []  # keep np array
         self.__st_peep = []
         self.__st_ps = []
+        self.__st_e_sens = []
         self.__vent_type = []
         self.__vent_mode = []
         self.__mand_type = []
@@ -232,6 +239,14 @@ class DomainRecord(DataBasic):
         self.__st_ps = list_
 
     @property
+    def st_e_sens(self):
+        return self.__st_e_sens
+
+    @st_e_sens.setter
+    def st_e_sens(self, list_):
+        self.__st_e_sens = list_
+
+    @property
     def vent_type(self):
         return self.__vent_type
 
@@ -276,6 +291,7 @@ class DomainResult(DataBasic):
         self.__v_m_list = []
         self.__peep_list = []
         self.__ps_list = []
+        self.__e_sens_list = []
         self.__sumP_list = []
 
     @property
@@ -309,6 +325,14 @@ class DomainResult(DataBasic):
     @ps_list.setter
     def ps_list(self, list_):
         self.__ps_list = list_
+
+    @property
+    def e_sens_list(self):
+        return self.__e_sens_list
+
+    @e_sens_list.setter
+    def e_sens_list(self, list_):
+        self.__e_sens_list = list_
 
     @property
     def sumP_list(self):

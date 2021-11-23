@@ -98,8 +98,8 @@ def GetBinOutput():
         zpx_output = process.ZpxParaCheck(BinImport.ImportPara)
         wave_output = process.ZdtPointCheck(PointProcess.PointProcessing)
 
-        ob1.machine = zif_output[para['machine name']].split(
-            '-')[0] if zif_output else None
+        ob1.machine = zif_output[para['machine name']] if zif_output else None
+        # resive the machine num
 
         ob1.sample_rate = zdt_output[para['sample rate']].item(
         ) if zdt_output else ReadSamplerate.ReadSamplerate(
@@ -114,6 +114,8 @@ def GetBinOutput():
         ob1.st_peep = zpx_output[para['PEEP setting']] if zpx_output else []
 
         ob1.st_ps = zpx_output[para['PS setting']] if zpx_output else []
+
+        ob1.st_e_sens = zpx_output[para['ESENS setting']] if zpx_output else []
 
         ob1.vent_type = zpx_output[para['vent type']] if zpx_output else []
 
@@ -138,6 +140,7 @@ def ResultGenerate():
         process.VMlistBuild(ReadSamplerate.ReadVentMode)
         obj_result.peep_list = process.SetsBuild(obj_record.st_peep)
         obj_result.ps_list = process.SetsBuild(obj_record.st_ps)
+        obj_result.e_sens_list = process.SetsBuild(obj_record.st_e_sens)
         obj_result.sumP_list = process.SetSum(obj_result.peep_list,
                                               obj_result.ps_list)
 
@@ -150,7 +153,7 @@ def TableBuild():
     colname = static.result_name_map
     objlist_0 = dynamic.objlist_record
     objlist_1 = dynamic.objlist_result
-    save_form_loc = static.save_table_name['table result']
+    save_form_loc = static.save_table_name['result full']
     df = dynamic.df
 
     df[colname['machine type']] = [obj.machine for obj in objlist_0]
@@ -164,8 +167,27 @@ def TableBuild():
     df[colname['ps setting']] = [
         '/'.join(str(x) for x in obj.ps_list) for obj in objlist_1
     ]
+    df[colname['esens setting']] = [
+        '/'.join(str(x) for x in obj.e_sens_list) for obj in objlist_1
+    ]
     df[colname['peep + ps']] = [
         '/'.join(str(x) for x in obj.sumP_list) for obj in objlist_1
     ]
+
+    FormProcess.CsvToLocal(df, dynamic.save_loc, save_form_loc)
+
+
+@basic.measure
+def TableProcess():
+
+    colname = static.result_name_map
+    save_form_loc = static.save_table_name['result shrink']
+    df = dynamic.df.copy()
+
+    filt_machine_840_0 = df[colname['machine type']].str.contains('840-4')
+    filt_machine_840_1 = df[colname['machine type']].str.contains('840-22')
+    filt_ICU4 = df[colname['ICU']] == 'ICU4F'
+
+    df = df[~filt_machine_840_0 & ~filt_machine_840_1 & ~filt_ICU4]
 
     FormProcess.CsvToLocal(df, dynamic.save_loc, save_form_loc)
