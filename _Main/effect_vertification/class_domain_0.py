@@ -79,6 +79,7 @@ class DomainRecord(DomainBasic):
         self.__objlist_resp = []
         self.__obj_average = None
         self.__obj_standev = None
+        self.__obj_ts = None
         self.__obj_hra = None
         self.__obj_hrv = None
 
@@ -195,6 +196,14 @@ class DomainRecord(DomainBasic):
         self.__obj_standev = v
 
     @property
+    def obj_ts(self):
+        return self.__obj_ts
+
+    @obj_ts.setter
+    def obj_ts(self, v):
+        self.__obj_ts = v
+
+    @property
     def obj_hra(self):
         return self.__obj_hra
 
@@ -250,6 +259,14 @@ class DomainAggr_Time(DomainBasic):
     @std.setter
     def std(self, v):
         self.__std = v
+
+    @property
+    def cv(self):
+        return self.__cv
+
+    @cv.setter
+    def cv(self, v):
+        self.__cv = v
 
 
 class DomainAggr_Freq(DomainBasic):

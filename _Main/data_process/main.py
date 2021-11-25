@@ -79,7 +79,7 @@ def StProcessor():
     func_3.TableProcess_PSV(1)
     func_3.TableProcess_SumP10(1)
     func_3.TableProcess_SumP12(1)
-    func_3.TbaleProcess_PEEPInvalid()
+    #func_3.TbaleProcess_PEEPInvalid()
 
 
 def main():

@@ -15,15 +15,16 @@ def RecordReading_RespCalculation():
 
 
 def Linear_Analysis_Preservation():
-    func.MethodAverage()
-    func.MethodStanDev()
+    #func.MethodAverage()
+    #func.MethodStanDev()
+    func.MethodTS()
     func.TimeAggregate()
     func.TimeDomainTableBuild('result: linear sumP12')
     func.LinearGraph()
 
 
 def Nonlinear_Analysis_Preservation():
-    func.ScatterPlotPer()
+    #func.ScatterPlotPer()
     func.MethodHRA()
     func.MethodHRV()
     func.NonlinearAggregate()

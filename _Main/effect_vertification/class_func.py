@@ -266,9 +266,9 @@ class Analysis(RecordFucBasic):
         theta_1 = 0
         theta_2 = 0
         for i in range(len(a_0)):
-            theta_1 += (np.arctan(a_1[i] / a_0[i]) -
+            theta_1 += (np.degrees(np.arctan(a_1[i] / a_0[i])) -
                         45) if a_0[i] < a_1[i] else 0
-            theta_2 += (-np.arctan(a_1[i] / a_0[i]) +
+            theta_2 += (-np.degrees(np.arctan(a_1[i] / a_0[i])) +
                         45) if a_0[i] > a_1[i] else 0
         si = 100 * theta_1 / (theta_1 + theta_2)
         return round(si, 2)
@@ -290,6 +290,19 @@ class Analysis(RecordFucBasic):
         array_ = np.array(list_)
         result = np.std(array_)
         return round(result, 2)
+
+    def TimeSeries(self, list_, method_sub):
+        array_ = np.array(list_)
+
+        if method_sub == 'AVE':
+            ave = np.mean(array_)
+            return round(ave, 2)
+        if method_sub == 'STD':
+            std = np.std(array_)
+            return round(std, 2)
+        if method_sub == 'CV':
+            cv = np.std(array_) / np.mean(array_)
+            return round(cv, 2)
 
     def HRA(self, list_, method_sub):
         array_0 = np.array(list_[:len(list_) - 1])
@@ -333,8 +346,8 @@ class Draft(RecordFucBasic):
 
     def BoxPlotMulti(self, x_label, y_labels, fig_name, filt=None):
         saveloc = Path(self.__save_loc) / (fig_name + '.png')
-        #df = self.__df[filt] if not filt.empty else self.__df
-        df = self.__df
+        df = self.__df[filt] if not filt.empty else self.__df
+        #df = self.__df
         multi_size = len(y_labels)
         sns.set_theme(style="whitegrid")
         sns.set(rc={'figure.figsize': (3.4 * multi_size, 4)})
@@ -356,7 +369,6 @@ class Draft(RecordFucBasic):
         plt.close()
 
     def VentWavePlots(self, s_F, s_P, s_V, save_name):
-
         pass
 
     def LinePlot(self):

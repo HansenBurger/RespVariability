@@ -29,7 +29,7 @@ class DataStatic(DataBasic):
         self.table_col_map = {
             'patient ID': 'PID',
             'record time': 'Resp_t',
-            'record ID': 'Resp_id',
+            'record ID': 'Record_id',
             'zdt name': 'zdt_1',
             'zpx name': 'zpx_1',
             'exTube end': 'endo_end'
@@ -52,6 +52,13 @@ class DataStatic(DataBasic):
         self.result_name_map = {
             'patient ID': 'PID',
             'exTube end': 'endo_end',
+            'CV RR': 'RR_3',
+            'CV V_T': 'V_T_3',
+            'CV VE': 'VE_3',
+            'CV WOB': 'WOB_3',
+            'CV RSBI': 'RSBI_3',
+            'CV MP(Jm)': 'MP_jm_3',
+            'CV MP(JL)': 'MP_jl_3',
             'Average RR': 'RR_1',
             'Average V_T': 'V_T_1',
             'Average VE': 'VE_1',

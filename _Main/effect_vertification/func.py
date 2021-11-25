@@ -281,7 +281,7 @@ def WaveformPlotting():
     pass
 
 
-def MethodBasic(method, result_obj, resp_list, method_sub=None):
+def __MethodBasic(method, result_obj, resp_list, method_sub=None):
     if method_sub:
         result_obj.RR = method([x.RR for x in resp_list], method_sub)
         result_obj.V_T = method([x.V_T_i for x in resp_list], method_sub)
@@ -307,7 +307,7 @@ def MethodAverage():
 
     for record in objlist:
         record.obj_average = domain1.DomainAverage()
-        MethodBasic(method, record.obj_average, record.objlist_resp)
+        __MethodBasic(method, record.obj_average, record.objlist_resp)
 
 
 @basic.measure
@@ -317,7 +317,22 @@ def MethodStanDev():
 
     for record in objlist:
         record.obj_standev = domain1.DomainStanDev()
-        MethodBasic(method, record.obj_standev, record.objlist_resp)
+        __MethodBasic(method, record.obj_standev, record.objlist_resp)
+
+
+@basic.measure
+def MethodTS():
+    method = func.Analysis().TimeSeries
+    objlist = dynamic.objlist_record
+
+    for record in objlist:
+        record.obj_ts = domain1.DomainTS()
+        record.obj_ts.ave = domain2.DomainTimeSeries()
+        record.obj_ts.std = domain2.DomainTimeSeries()
+        record.obj_ts.cv = domain2.DomainTimeSeries()
+        __MethodBasic(method, record.obj_ts.ave, record.objlist_resp, 'AVE')
+        __MethodBasic(method, record.obj_ts.std, record.objlist_resp, 'STD')
+        __MethodBasic(method, record.obj_ts.cv, record.objlist_resp, 'CV')
 
 
 @basic.measure
@@ -330,9 +345,9 @@ def MethodHRA():
         record.obj_hra.pi = domain2.DomainNonlinear()
         record.obj_hra.gi = domain2.DomainNonlinear()
         record.obj_hra.si = domain2.DomainNonlinear()
-        MethodBasic(method, record.obj_hra.pi, record.objlist_resp, 'PI')
-        MethodBasic(method, record.obj_hra.gi, record.objlist_resp, 'GI')
-        MethodBasic(method, record.obj_hra.si, record.objlist_resp, 'SI')
+        __MethodBasic(method, record.obj_hra.pi, record.objlist_resp, 'PI')
+        __MethodBasic(method, record.obj_hra.gi, record.objlist_resp, 'GI')
+        __MethodBasic(method, record.obj_hra.si, record.objlist_resp, 'SI')
 
 
 @basic.measure
@@ -344,8 +359,8 @@ def MethodHRV():
         record.obj_hrv = domain1.DomainHRV()
         record.obj_hrv.sd1 = domain2.DomainNonlinear()
         record.obj_hrv.sd2 = domain2.DomainNonlinear()
-        MethodBasic(method, record.obj_hrv.sd1, record.objlist_resp, 'SD1')
-        MethodBasic(method, record.obj_hrv.sd2, record.objlist_resp, 'SD2')
+        __MethodBasic(method, record.obj_hrv.sd1, record.objlist_resp, 'SD1')
+        __MethodBasic(method, record.obj_hrv.sd2, record.objlist_resp, 'SD2')
 
 
 @basic.measure
@@ -360,8 +375,9 @@ def TimeAggregate():
 
         obj.pid = objlist_2[i].pid
         obj.end = objlist_2[i].end
-        obj.ave = objlist_1[i].obj_average
-        obj.std = objlist_1[i].obj_standev
+        obj.ave = objlist_1[i].obj_ts.ave
+        obj.std = objlist_1[i].obj_ts.std
+        obj.cv = objlist_1[i].obj_ts.cv
 
         dynamic.time_results.append(obj)
 
@@ -419,6 +435,14 @@ def TimeDomainTableBuild(form_name):
     df[colname['Standev RSBI']] = [x.std.rsbi for x in result_list]
     df[colname['Standev MP(Jm)']] = [x.std.mp_jm for x in result_list]
     df[colname['Standev MP(JL)']] = [x.std.mp_jl for x in result_list]
+
+    df[colname['CV RR']] = [x.cv.RR for x in result_list]
+    df[colname['CV V_T']] = [x.cv.V_T for x in result_list]
+    df[colname['CV VE']] = [x.cv.VE for x in result_list]
+    df[colname['CV WOB']] = [x.cv.wob for x in result_list]
+    df[colname['CV RSBI']] = [x.cv.rsbi for x in result_list]
+    df[colname['CV MP(Jm)']] = [x.cv.mp_jm for x in result_list]
+    df[colname['CV MP(JL)']] = [x.cv.mp_jl for x in result_list]
 
     dynamic.df_new = df
 
@@ -496,8 +520,10 @@ def LinearGraph():
     extube_colname_list = ['exTube end'] * targets_len
     average_colname_list = [('Average ' + x) for x in targets_list]
     standev_colname_list = [('Standev ' + x) for x in targets_list]
+    cv_colname_list = [('CV ' + x) for x in targets_list]
     average_savename_list = [(x + '_average') for x in targets_list]
     standev_savename_list = [(x + '_standev') for x in targets_list]
+    cv_savename_list = [(x + '_cv') for x in targets_list]
 
     for i in range(targets_len):
 
@@ -508,6 +534,10 @@ def LinearGraph():
         draf(x_label=colname[extube_colname_list[i]],
              y_label=colname[standev_colname_list[i]],
              fig_name=standev_savename_list[i])
+
+        draf(x_label=colname[extube_colname_list[i]],
+             y_label=colname[cv_colname_list[i]],
+             fig_name=cv_savename_list[i])
 
 
 @basic.measure

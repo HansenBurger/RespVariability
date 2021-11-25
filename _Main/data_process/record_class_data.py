@@ -1,6 +1,3 @@
-import re
-
-
 class DataBasic():
     def __init__(self) -> None:
         pass
@@ -28,7 +25,7 @@ class DataStatic(DataBasic):
 
         self.table_col_map = {
             'record time': 'Resp_t',
-            'record ID': 'Resp_id',
+            'record ID': 'Record_id',
             'zdt name': 'zdt_1',
             'zpx name': 'zpx_1',
         }
