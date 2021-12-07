@@ -11,10 +11,13 @@ class DomainResp(DomainBasic):
         self.__V_T_e = 0
         self.__VE = 0
         self.__wob = 0
+        self.__wob_full = 0
         self.__wob_a = 0
         self.__wob_b = 0
-        self.__mp_jm = 0
-        self.__mp_jl = 0
+        self.__mp_jm_d = 0
+        self.__mp_jl_d = 0
+        self.__mp_jm_t = 0
+        self.__mp_jl_t = 0
         self.__rsbi = 0
 
     @property
@@ -66,6 +69,14 @@ class DomainResp(DomainBasic):
         self.__wob_a = v
 
     @property
+    def wob_full(self):
+        return self.__wob_full
+
+    @wob_full.setter
+    def wob_full(self, v):
+        self.__wob_full = v
+
+    @property
     def wob_b(self):
         return self.__wob_b
 
@@ -74,72 +85,36 @@ class DomainResp(DomainBasic):
         self.__wob_b = v
 
     @property
-    def mp_jm(self):
-        return self.__mp_jm
+    def mp_jm_d(self):
+        return self.__mp_jm_d
 
-    @mp_jm.setter
-    def mp_jm(self, v):
-        self.__mp_jm = v
-
-    @property
-    def mp_jl(self):
-        return self.__mp_jl
-
-    @mp_jl.setter
-    def mp_jl(self, v):
-        self.__mp_jl = v
+    @mp_jm_d.setter
+    def mp_jm_d(self, v):
+        self.__mp_jm_d = v
 
     @property
-    def rsbi(self):
-        return self.__rsbi
+    def mp_jl_d(self):
+        return self.__mp_jl_d
 
-    @rsbi.setter
-    def rsbi(self, v):
-        self.__rsbi = v
-
-
-class DomainAverage(DomainBasic):
-    def __init__(self):
-        super().__init__()
-        self.__RR = 0
-        self.__V_T = 0
-        self.__VE = 0
-        self.__wob = 0
-        self.__rsbi = 0
-        self.__mp_jm = 0
-        self.__mp_jl = 0
+    @mp_jl_d.setter
+    def mp_jl_d(self, v):
+        self.__mp_jl_d = v
 
     @property
-    def RR(self):
-        return self.__RR
+    def mp_jm_t(self):
+        return self.__mp_jm_t
 
-    @RR.setter
-    def RR(self, v):
-        self.__RR = v
-
-    @property
-    def V_T(self):
-        return self.__V_T
-
-    @V_T.setter
-    def V_T(self, v):
-        self.__V_T = v
+    @mp_jm_t.setter
+    def mp_jm_t(self, v):
+        self.__mp_jm_t = v
 
     @property
-    def VE(self):
-        return self.__VE
+    def mp_jl_t(self):
+        return self.__mp_jl_t
 
-    @VE.setter
-    def VE(self, v):
-        self.__VE = v
-
-    @property
-    def wob(self):
-        return self.__wob
-
-    @wob.setter
-    def wob(self, v):
-        self.__wob = v
+    @mp_jl_t.setter
+    def mp_jl_t(self, v):
+        self.__mp_jl_t = v
 
     @property
     def rsbi(self):
@@ -148,90 +123,6 @@ class DomainAverage(DomainBasic):
     @rsbi.setter
     def rsbi(self, v):
         self.__rsbi = v
-
-    @property
-    def mp_jm(self):
-        return self.__mp_jm
-
-    @mp_jm.setter
-    def mp_jm(self, v):
-        self.__mp_jm = v
-
-    @property
-    def mp_jl(self):
-        return self.__mp_jl
-
-    @mp_jl.setter
-    def mp_jl(self, v):
-        self.__mp_jl = v
-
-
-class DomainStanDev(DomainBasic):
-    def __init__(self):
-        super().__init__()
-        self.__RR = 0
-        self.__V_T = 0
-        self.__VE = 0
-        self.__wob = 0
-        self.__rsbi = 0
-        self.__mp_jm = 0
-        self.__mp_jl = 0
-
-    @property
-    def RR(self):
-        return self.__RR
-
-    @RR.setter
-    def RR(self, v):
-        self.__RR = v
-
-    @property
-    def V_T(self):
-        return self.__V_T
-
-    @V_T.setter
-    def V_T(self, v):
-        self.__V_T = v
-
-    @property
-    def VE(self):
-        return self.__VE
-
-    @VE.setter
-    def VE(self, v):
-        self.__VE = v
-
-    @property
-    def wob(self):
-        return self.__wob
-
-    @wob.setter
-    def wob(self, v):
-        self.__wob = v
-
-    @property
-    def rsbi(self):
-        return self.__rsbi
-
-    @rsbi.setter
-    def rsbi(self, v):
-        self.__rsbi = v
-
-    @property
-    def mp_jm(self):
-        return self.__mp_jm
-
-    @mp_jm.setter
-    def mp_jm(self, v):
-        self.__mp_jm = v
-
-    @property
-    def mp_jl(self):
-        return self.__mp_jl
-
-    @mp_jl.setter
-    def mp_jl(self, v):
-        self.__mp_jl = v
 
 
 class DomainTS(DomainBasic):

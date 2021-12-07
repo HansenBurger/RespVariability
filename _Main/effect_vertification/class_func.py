@@ -166,12 +166,21 @@ class Calculation(RecordFucBasic):
         return round(v_t_e, 2)
 
     def WOB(self):
-        wob_angle = (self.__p_in[-1] * self.__v_in[-1]) / 1000
-        wob_a = abs(wob_angle - abs(np.trapz(self.__v_in, self.__p_in)) / 1000)
-        wob_b = abs(wob_angle - abs(np.trapz(self.__v_ex, self.__p_ex)) / 1000)
-        wob = wob_a + wob_b
+        vp_rectangle = (self.__p_in[-1] * self.__v_in[-1]) / 1000
+        peep_rectangle = (self.__p_in[0] * self.__v_in[-1]) / 1000
+        inhal_points = abs(np.trapz(self.__v_in, self.__p_in)) / 1000
 
-        return [round(wob, 2), round(wob_a, 2), round(wob_b, 2)]
+        wob_full = vp_rectangle - inhal_points
+        wob = wob_full - peep_rectangle
+        wob_b = ((self.__p_in[-1] - self.__p_in[0]) * self.__v_in[-1]) / 2000
+        wob_a = wob - wob_b
+
+        return [
+            round(wob, 2),
+            round(wob_full, 2),
+            round(wob_a, 2),
+            round(wob_b, 2)
+        ]
 
     def VE(self, rr, v_t):
         VE = rr * (v_t / 1000)
@@ -181,9 +190,9 @@ class Calculation(RecordFucBasic):
         rsbi = rr / (v_t / 1000)
         return round(rsbi, 2)
 
-    def MP_Area(self, rr, v_t, wob_a):
-        mp_jm_area = 0.098 * rr * wob_a
-        mp_jl_area = 0.098 * wob_a / (v_t * 0.001)
+    def MP_Area(self, rr, v_t, wob):
+        mp_jm_area = 0.098 * rr * wob
+        mp_jl_area = 0.098 * wob / (v_t * 0.001)
         return [round(mp_jm_area, 2), round(mp_jl_area, 2)]
 
 
@@ -221,11 +230,15 @@ class ParaValidity(RecordFucBasic):
         self.__ValRangeCheck(wob_b, val_range)
 
     def __MP_val(self):
-        mp_jm = self.__obj.mp_jm
-        mp_jl = self.__obj.mp_jl
+        mp_jm_d = self.__obj.mp_jm_d
+        mp_jl_d = self.__obj.mp_jl_d
+        mp_jm_t = self.__obj.mp_jm_t
+        mp_jl_t = self.__obj.mp_jl_t
         val_range = range(0, 20)
-        self.__ValRangeCheck(mp_jm, val_range)
-        self.__ValRangeCheck(mp_jl, val_range)
+        self.__ValRangeCheck(mp_jm_d, val_range)
+        self.__ValRangeCheck(mp_jl_d, val_range)
+        self.__ValRangeCheck(mp_jm_t, val_range)
+        self.__ValRangeCheck(mp_jl_t, val_range)
 
     def ValTotal(self, rr=True, vt=True, ve=True, wob=True, mp=True):
         if rr:

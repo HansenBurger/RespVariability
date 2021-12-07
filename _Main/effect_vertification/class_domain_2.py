@@ -11,8 +11,10 @@ class DomainTimeSeries(DomainBasic):
         self.__VE = 0
         self.__wob = 0
         self.__rsbi = 0
-        self.__mp_jl = 0
-        self.__mp_jm = 0
+        self.__mp_jl_d = 0
+        self.__mp_jm_d = 0
+        self.__mp_jl_t = 0
+        self.__mp_jm_t = 0
 
     @property
     def RR(self):
@@ -55,20 +57,36 @@ class DomainTimeSeries(DomainBasic):
         self.__rsbi = v
 
     @property
-    def mp_jm(self):
-        return self.__mp_jm
+    def mp_jm_d(self):
+        return self.__mp_jm_d
 
-    @mp_jm.setter
-    def mp_jm(self, v):
-        self.__mp_jm = v
+    @mp_jm_d.setter
+    def mp_jm_d(self, v):
+        self.__mp_jm_d = v
 
     @property
-    def mp_jl(self):
-        return self.__mp_jl
+    def mp_jl_d(self):
+        return self.__mp_jl_d
 
-    @mp_jl.setter
-    def mp_jl(self, v):
-        self.__mp_jl = v
+    @mp_jl_d.setter
+    def mp_jl_d(self, v):
+        self.__mp_jl_d = v
+
+    @property
+    def mp_jm_t(self):
+        return self.__mp_jm_t
+
+    @mp_jm_t.setter
+    def mp_jm_t(self, v):
+        self.__mp_jm_t = v
+
+    @property
+    def mp_jl_t(self):
+        return self.__mp_jl_t
+
+    @mp_jl_t.setter
+    def mp_jl_t(self, v):
+        self.__mp_jl_t = v
 
 
 class DomainNonlinear(DomainBasic):
@@ -79,8 +97,10 @@ class DomainNonlinear(DomainBasic):
         self.__VE = 0
         self.__wob = 0
         self.__rsbi = 0
-        self.__mp_jl = 0
-        self.__mp_jm = 0
+        self.__mp_jl_d = 0
+        self.__mp_jm_d = 0
+        self.__mp_jl_t = 0
+        self.__mp_jm_t = 0
 
     @property
     def RR(self):
@@ -123,17 +143,33 @@ class DomainNonlinear(DomainBasic):
         self.__rsbi = v
 
     @property
-    def mp_jm(self):
-        return self.__mp_jm
+    def mp_jm_d(self):
+        return self.__mp_jm_d
 
-    @mp_jm.setter
-    def mp_jm(self, v):
-        self.__mp_jm = v
+    @mp_jm_d.setter
+    def mp_jm_d(self, v):
+        self.__mp_jm_d = v
 
     @property
-    def mp_jl(self):
-        return self.__mp_jl
+    def mp_jl_d(self):
+        return self.__mp_jl_d
 
-    @mp_jl.setter
-    def mp_jl(self, v):
-        self.__mp_jl = v
+    @mp_jl_d.setter
+    def mp_jl_d(self, v):
+        self.__mp_jl_d = v
+
+    @property
+    def mp_jm_t(self):
+        return self.__mp_jm_t
+
+    @mp_jm_t.setter
+    def mp_jm_t(self, v):
+        self.__mp_jm_t = v
+
+    @property
+    def mp_jl_t(self):
+        return self.__mp_jl_t
+
+    @mp_jl_t.setter
+    def mp_jl_t(self, v):
+        self.__mp_jl_t = v

@@ -184,12 +184,17 @@ def Calculate():
 
                 wob_output = counter.WOB()
                 resp.wob = wob_output[0]
-                resp.wob_a = wob_output[1]
-                resp.wob_b = wob_output[2]
+                resp.wob_full = wob_output[1]
+                resp.wob_a = wob_output[2]
+                resp.wob_b = wob_output[3]
 
-                mp_output = counter.MP_Area(resp.RR, resp.V_T_i, resp.wob_a)
-                resp.mp_jm = mp_output[0]
-                resp.mp_jl = mp_output[1]
+                mp_out_d = counter.MP_Area(resp.RR, resp.V_T_i, resp.wob)
+                resp.mp_jm_d = mp_out_d[0]
+                resp.mp_jl_d = mp_out_d[1]
+
+                mp_out_ds = counter.MP_Area(resp.RR, resp.V_T_i, resp.wob_full)
+                resp.mp_jm_t = mp_out_ds[0]
+                resp.mp_jl_t = mp_out_ds[1]
 
             record.objlist_resp.append(resp)
 
@@ -232,6 +237,8 @@ def ScatterPlotPer():
     objlist_1 = dynamic.objlist_record
     objlist_2 = dynamic.objlist_table
     loc = dynamic.save_graph_loc
+    save_loc = pathlib.Path(loc) / 'ScatterPlots'
+    save_loc.mkdir(parents=True, exist_ok=True)
 
     for i in range(len(objlist_1)):
 
@@ -255,22 +262,30 @@ def ScatterPlotPer():
         rsbi = [x.rsbi for x in resp_list]
         df['RSBI_0'] = rsbi[:len(rsbi) - 1]
         df['RSBI_1'] = rsbi[1:]
-        mp_jl = [x.mp_jl for x in resp_list]
-        df['MP(JL)_0'] = mp_jl[:len(mp_jl) - 1]
-        df['MP(JL)_1'] = mp_jl[1:]
-        mp_jm = [x.mp_jm for x in resp_list]
-        df['MP(Jm)_0'] = mp_jm[:len(mp_jm) - 1]
-        df['MP(Jm)_1'] = mp_jm[1:]
+        mp_jl = [x.mp_jl_d for x in resp_list]
+        df['MP(JL)_d_0'] = mp_jl[:len(mp_jl) - 1]
+        df['MP(JL)_d_1'] = mp_jl[1:]
+        mp_jm = [x.mp_jm_d for x in resp_list]
+        df['MP(Jm)_d_0'] = mp_jm[:len(mp_jm) - 1]
+        df['MP(Jm)_d_1'] = mp_jm[1:]
+        mp_jl = [x.mp_jl_t for x in resp_list]
+        df['MP(JL)_ds_0'] = mp_jl[:len(mp_jl) - 1]
+        df['MP(JL)_ds_1'] = mp_jl[1:]
+        mp_jm = [x.mp_jm_t for x in resp_list]
+        df['MP(Jm)_ds_0'] = mp_jm[:len(mp_jm) - 1]
+        df['MP(Jm)_ds_1'] = mp_jm[1:]
 
-        draft_p = func.Draft(loc, df)
+        draft_p = func.Draft(str(save_loc), df)
 
         draft_p.ScatterPlot('RR_0', 'RR_1', 'RR', pid, end)
         draft_p.ScatterPlot('VT_0', 'VT_1', 'VT', pid, end)
         draft_p.ScatterPlot('VE_0', 'VE_1', 'VE', pid, end)
         draft_p.ScatterPlot('WOB_0', 'WOB_1', 'WOB', pid, end)
         draft_p.ScatterPlot('RSBI_0', 'RSBI_1', 'RSBI', pid, end)
-        draft_p.ScatterPlot('MP(JL)_0', 'MP(JL)_1', 'MP(JL)', pid, end)
-        draft_p.ScatterPlot('MP(Jm)_0', 'MP(Jm)_1', 'MP(Jm)', pid, end)
+        draft_p.ScatterPlot('MP(JL)_d_0', 'MP(JL)_d_1', 'MP(JL)d', pid, end)
+        draft_p.ScatterPlot('MP(Jm)_d_0', 'MP(Jm)_d_1', 'MP(Jm)d', pid, end)
+        draft_p.ScatterPlot('MP(JL)_ds_0', 'MP(JL)_ds_1', 'MP(JL)ds', pid, end)
+        draft_p.ScatterPlot('MP(Jm)_ds_0', 'MP(Jm)_ds_1', 'MP(Jm)ds', pid, end)
 
 
 @basic.measure
@@ -281,43 +296,25 @@ def WaveformPlotting():
     pass
 
 
-def __MethodBasic(method, result_obj, resp_list, method_sub=None):
+def __MethodBasic(method, result, resp_list, method_sub=None):
     if method_sub:
-        result_obj.RR = method([x.RR for x in resp_list], method_sub)
-        result_obj.V_T = method([x.V_T_i for x in resp_list], method_sub)
-        result_obj.VE = method([x.VE for x in resp_list], method_sub)
-        result_obj.wob = method([x.wob for x in resp_list], method_sub)
-        result_obj.rsbi = method([x.rsbi for x in resp_list], method_sub)
-        result_obj.mp_jm = method([x.mp_jm for x in resp_list], method_sub)
-        result_obj.mp_jl = method([x.mp_jl for x in resp_list], method_sub)
+        result.RR = method([x.RR for x in resp_list], method_sub)
+        result.V_T = method([x.V_T_i for x in resp_list], method_sub)
+        result.VE = method([x.VE for x in resp_list], method_sub)
+        result.wob = method([x.wob for x in resp_list], method_sub)
+        result.rsbi = method([x.rsbi for x in resp_list], method_sub)
+        result.mp_jm_d = method([x.mp_jm_d for x in resp_list], method_sub)
+        result.mp_jl_d = method([x.mp_jl_d for x in resp_list], method_sub)
+        result.mp_jm_t = method([x.mp_jm_t for x in resp_list], method_sub)
+        result.mp_jl_t = method([x.mp_jl_t for x in resp_list], method_sub)
     else:
-        result_obj.RR = method([x.RR for x in resp_list])
-        result_obj.V_T = method([x.V_T_i for x in resp_list])
-        result_obj.VE = method([x.VE for x in resp_list])
-        result_obj.wob = method([x.wob for x in resp_list])
-        result_obj.rsbi = method([x.rsbi for x in resp_list])
-        result_obj.mp_jm = method([x.mp_jm for x in resp_list])
-        result_obj.mp_jl = method([x.mp_jl for x in resp_list])
-
-
-@basic.measure
-def MethodAverage():
-    method = func.Analysis().Mean
-    objlist = dynamic.objlist_record
-
-    for record in objlist:
-        record.obj_average = domain1.DomainAverage()
-        __MethodBasic(method, record.obj_average, record.objlist_resp)
-
-
-@basic.measure
-def MethodStanDev():
-    method = func.Analysis().StanDev
-    objlist = dynamic.objlist_record
-
-    for record in objlist:
-        record.obj_standev = domain1.DomainStanDev()
-        __MethodBasic(method, record.obj_standev, record.objlist_resp)
+        result.RR = method([x.RR for x in resp_list])
+        result.V_T = method([x.V_T_i for x in resp_list])
+        result.VE = method([x.VE for x in resp_list])
+        result.wob = method([x.wob for x in resp_list])
+        result.rsbi = method([x.rsbi for x in resp_list])
+        result.mp_jm = method([x.mp_jm for x in resp_list])
+        result.mp_jl = method([x.mp_jl for x in resp_list])
 
 
 @basic.measure
@@ -425,24 +422,30 @@ def TimeDomainTableBuild(form_name):
     df[colname['Average VE']] = [x.ave.VE for x in result_list]
     df[colname['Average WOB']] = [x.ave.wob for x in result_list]
     df[colname['Average RSBI']] = [x.ave.rsbi for x in result_list]
-    df[colname['Average MP(Jm)']] = [x.ave.mp_jm for x in result_list]
-    df[colname['Average MP(JL)']] = [x.ave.mp_jl for x in result_list]
+    df[colname['Average MP(Jm) d']] = [x.ave.mp_jm_d for x in result_list]
+    df[colname['Average MP(JL) d']] = [x.ave.mp_jl_d for x in result_list]
+    df[colname['Average MP(Jm) t']] = [x.ave.mp_jm_t for x in result_list]
+    df[colname['Average MP(JL) t']] = [x.ave.mp_jl_t for x in result_list]
 
     df[colname['Standev RR']] = [x.std.RR for x in result_list]
     df[colname['Standev V_T']] = [x.std.V_T for x in result_list]
     df[colname['Standev VE']] = [x.std.VE for x in result_list]
     df[colname['Standev WOB']] = [x.std.wob for x in result_list]
     df[colname['Standev RSBI']] = [x.std.rsbi for x in result_list]
-    df[colname['Standev MP(Jm)']] = [x.std.mp_jm for x in result_list]
-    df[colname['Standev MP(JL)']] = [x.std.mp_jl for x in result_list]
+    df[colname['Standev MP(Jm) d']] = [x.std.mp_jm_d for x in result_list]
+    df[colname['Standev MP(JL) d']] = [x.std.mp_jl_d for x in result_list]
+    df[colname['Standev MP(Jm) t']] = [x.std.mp_jm_t for x in result_list]
+    df[colname['Standev MP(JL) t']] = [x.std.mp_jl_t for x in result_list]
 
     df[colname['CV RR']] = [x.cv.RR for x in result_list]
     df[colname['CV V_T']] = [x.cv.V_T for x in result_list]
     df[colname['CV VE']] = [x.cv.VE for x in result_list]
     df[colname['CV WOB']] = [x.cv.wob for x in result_list]
     df[colname['CV RSBI']] = [x.cv.rsbi for x in result_list]
-    df[colname['CV MP(Jm)']] = [x.cv.mp_jm for x in result_list]
-    df[colname['CV MP(JL)']] = [x.cv.mp_jl for x in result_list]
+    df[colname['CV MP(Jm) d']] = [x.cv.mp_jm_d for x in result_list]
+    df[colname['CV MP(JL) d']] = [x.cv.mp_jl_d for x in result_list]
+    df[colname['CV MP(Jm) t']] = [x.cv.mp_jm_t for x in result_list]
+    df[colname['CV MP(JL) t']] = [x.cv.mp_jl_t for x in result_list]
 
     dynamic.df_new = df
 
@@ -475,12 +478,18 @@ def NonlinearTableBuild(form_name):
     df[colname['HRA RSBI'][0]] = [x.hra_pi.rsbi for x in result_list]
     df[colname['HRA RSBI'][1]] = [x.hra_gi.rsbi for x in result_list]
     df[colname['HRA RSBI'][2]] = [x.hra_si.rsbi for x in result_list]
-    df[colname['HRA MP(Jm)'][0]] = [x.hra_pi.mp_jm for x in result_list]
-    df[colname['HRA MP(Jm)'][1]] = [x.hra_gi.mp_jm for x in result_list]
-    df[colname['HRA MP(Jm)'][2]] = [x.hra_si.mp_jm for x in result_list]
-    df[colname['HRA MP(JL)'][0]] = [x.hra_pi.mp_jl for x in result_list]
-    df[colname['HRA MP(JL)'][1]] = [x.hra_gi.mp_jl for x in result_list]
-    df[colname['HRA MP(JL)'][2]] = [x.hra_si.mp_jl for x in result_list]
+    df[colname['HRA MP(Jm) d'][0]] = [x.hra_pi.mp_jm_d for x in result_list]
+    df[colname['HRA MP(Jm) d'][1]] = [x.hra_gi.mp_jm_d for x in result_list]
+    df[colname['HRA MP(Jm) d'][2]] = [x.hra_si.mp_jm_d for x in result_list]
+    df[colname['HRA MP(Jm) t'][0]] = [x.hra_pi.mp_jm_t for x in result_list]
+    df[colname['HRA MP(Jm) t'][1]] = [x.hra_gi.mp_jm_t for x in result_list]
+    df[colname['HRA MP(Jm) t'][2]] = [x.hra_si.mp_jm_t for x in result_list]
+    df[colname['HRA MP(JL) d'][0]] = [x.hra_pi.mp_jl_d for x in result_list]
+    df[colname['HRA MP(JL) d'][1]] = [x.hra_gi.mp_jl_d for x in result_list]
+    df[colname['HRA MP(JL) d'][2]] = [x.hra_si.mp_jl_d for x in result_list]
+    df[colname['HRA MP(JL) t'][0]] = [x.hra_pi.mp_jl_t for x in result_list]
+    df[colname['HRA MP(JL) t'][1]] = [x.hra_gi.mp_jl_t for x in result_list]
+    df[colname['HRA MP(JL) t'][2]] = [x.hra_si.mp_jl_t for x in result_list]
 
     df[colname['HRV RR'][0]] = [x.hrv_sd1.RR for x in result_list]
     df[colname['HRV RR'][1]] = [x.hrv_sd2.RR for x in result_list]
@@ -492,10 +501,14 @@ def NonlinearTableBuild(form_name):
     df[colname['HRV WOB'][1]] = [x.hrv_sd2.wob for x in result_list]
     df[colname['HRV RSBI'][0]] = [x.hrv_sd1.rsbi for x in result_list]
     df[colname['HRV RSBI'][1]] = [x.hrv_sd2.rsbi for x in result_list]
-    df[colname['HRV MP(Jm)'][0]] = [x.hrv_sd1.mp_jm for x in result_list]
-    df[colname['HRV MP(Jm)'][1]] = [x.hrv_sd2.mp_jm for x in result_list]
-    df[colname['HRV MP(JL)'][0]] = [x.hrv_sd1.mp_jl for x in result_list]
-    df[colname['HRV MP(JL)'][1]] = [x.hrv_sd2.mp_jl for x in result_list]
+    df[colname['HRV MP(Jm) d'][0]] = [x.hrv_sd1.mp_jm_d for x in result_list]
+    df[colname['HRV MP(Jm) d'][1]] = [x.hrv_sd2.mp_jm_d for x in result_list]
+    df[colname['HRV MP(Jm) t'][0]] = [x.hrv_sd1.mp_jm_t for x in result_list]
+    df[colname['HRV MP(Jm) t'][1]] = [x.hrv_sd2.mp_jm_t for x in result_list]
+    df[colname['HRV MP(JL) d'][0]] = [x.hrv_sd1.mp_jl_d for x in result_list]
+    df[colname['HRV MP(JL) d'][1]] = [x.hrv_sd2.mp_jl_d for x in result_list]
+    df[colname['HRV MP(JL) t'][0]] = [x.hrv_sd1.mp_jl_t for x in result_list]
+    df[colname['HRV MP(JL) t'][1]] = [x.hrv_sd2.mp_jl_t for x in result_list]
 
     dynamic.df_new = df
 

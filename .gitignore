@@ -7,3 +7,7 @@
 # ignore all file .json
 *.json
 */__pycache__
+
+# ignore pyc file
+*.pyc
+**.__pycache__

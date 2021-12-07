@@ -18,7 +18,7 @@ vent_info = {
         'SAMPLE_RATE': 50,
         'VENT_TYPE': ['NIV', 'IV'],
         'VENT_MODE': ['AC', 'SIMV', 'SPONT', 'BILEVL'],
-        'MAND_TYPE': ['VC', 'PC', 'VC+']
+        'MAND_TYPE': ['PC', 'VC', 'VC+']
     },
     'Maquet': {
         'NAME': ['Serv', 'Servoi', 'Servos', 'xsServoi', 'xsServos'],

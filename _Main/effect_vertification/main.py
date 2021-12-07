@@ -2,7 +2,7 @@ import func
 
 
 def TableProcessing_RecordGeneration(switch=True):
-    func.SaveLocGenerate('effection_sumP12')
+    func.SaveLocGenerate('effection_PSV_ICU4')
     func.MainTableBuild() if switch else func.TestTableBuild()
     func.GenerateObjList()
     func.GenerateFileLoc()
@@ -15,21 +15,19 @@ def RecordReading_RespCalculation():
 
 
 def Linear_Analysis_Preservation():
-    #func.MethodAverage()
-    #func.MethodStanDev()
     func.MethodTS()
     func.TimeAggregate()
-    func.TimeDomainTableBuild('result: linear sumP12')
-    func.LinearGraph()
+    func.TimeDomainTableBuild('result: linear PSV')
+    # func.LinearGraph()
 
 
 def Nonlinear_Analysis_Preservation():
-    #func.ScatterPlotPer()
+    # func.ScatterPlotPer()
     func.MethodHRA()
     func.MethodHRV()
     func.NonlinearAggregate()
-    func.NonlinearTableBuild('result: nonlinear sumP12')
-    func.NonlinearGraph()
+    func.NonlinearTableBuild('result: nonlinear PSV')
+    # func.NonlinearGraph()
 
 
 def main():
