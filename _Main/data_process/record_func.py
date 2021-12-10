@@ -42,7 +42,7 @@ def MainTableBuild():
 
 def TestTableBuild():
 
-    table_loc = r'C:\Users\HY_Burger\Desktop\Project\RespVariability\test.csv'
+    table_loc = r'_Main/effect_vertification/test.csv'
     dynamic.df = FormProcess.FormPreProcess(df_loc=table_loc)
     FormProcess.TimeShift(df=dynamic.df, column_names=static.time_col)
 

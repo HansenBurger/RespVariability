@@ -9,7 +9,7 @@ class DataStatic(DataBasic):
         self.file_loc_dict = {
             'main table': {
                 'category': 'FormRoute',
-                'name': 'FiltedForm_with'
+                'name': 'FiltedForm_with_f'
             },
             'save form': {
                 'category': 'ResultRoute',

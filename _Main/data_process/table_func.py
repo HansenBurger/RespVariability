@@ -3,7 +3,7 @@ import table_class_data as data
 import table_class_filt as func
 from datetime import datetime
 
-sys.path.append(str(pathlib.Path.cwd().parents[1]))
+sys.path.append(str(pathlib.Path.cwd()))
 from Code import InIReaWri, FormProcess
 from Code.Fundal import basic
 

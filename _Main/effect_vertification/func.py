@@ -6,7 +6,7 @@ import class_domain_0 as domain0
 import class_domain_1 as domain1
 import class_domain_2 as domain2
 
-sys.path.append(str(pathlib.Path.cwd().parents[1]))
+sys.path.append(str(pathlib.Path.cwd()))
 from Code import InIReaWri, FormProcess, PointProcess
 from Code.Fundal import basic, BinImport, ReadSamplerate
 
