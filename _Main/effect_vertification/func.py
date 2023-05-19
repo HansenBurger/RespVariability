@@ -1,4 +1,6 @@
-import sys, pathlib, datetime
+import sys, pathlib, datetime, sqlite3
+from tkinter import N
+import pandas as pd
 
 import class_func as func
 import class_data as data
@@ -51,6 +53,40 @@ def MainTableBuild():
     dynamic.df = FormProcess.FormPreProcess(df_loc=table_loc)
     dynamic.df_new = FormProcess.FormPreProcess()
     FormProcess.TimeShift(dynamic.df, static.time_col_name)
+
+
+@basic.measure
+def MainTableBuild_db(table_name):
+    db = r'C:\Main\Data\_\Database\sqlite\RespdataWean_2203.db'
+    query_state = '''
+    SELECT * FROM {0}
+    WHERE vent_t > 1800
+    '''.format(table_name)
+    with sqlite3.connect(db) as con:
+        df = pd.read_sql(query_state, con)
+    col_map = {
+        'PID': 'PID',
+        'ICU': 'ICU',
+        'RID': 'Record_id',
+        'REC_t': 'Resp_t',
+        'zdt': 'zdt_1',
+        'zpx': 'zpx_1',
+        'Extube_t': 'endo_t',
+        'Extube_end': 'endo_end',
+        'machine': 'machine',
+        'vent_t': 'vent_t',
+        'vent_m_0': 'vent_m_0',
+        'vent_m_1': 'vent_m_1',
+        'vent_m_2': 'vent_m_2',
+        'st_peep': 'st_peep',
+        'st_ps': 'st_ps',
+        'st_e_sens': 'st_e_sens',
+        'st_sumP': 'st_sumP'
+    }
+    df = df.rename(columns=col_map)
+    FormProcess.TimeShift(df, static.time_col_name)
+    dynamic.df = df[:]
+    dynamic.df_new = FormProcess.FormPreProcess()
 
 
 @basic.measure
@@ -176,6 +212,7 @@ def Calculate():
                 continue
 
             else:
+                resp.ts = counter.RespT(record.sample_rate)
                 resp.RR = counter.RR(record.sample_rate)
                 resp.V_T_i = counter.V_t_i()
                 resp.V_T_e = counter.V_t_e()
@@ -229,6 +266,38 @@ def RespValidity():
                 resp = None
 
         obj.objlist_resp = [i for i in resplist if i]
+
+
+@basic.measure
+def TimeScreening(t_st):
+    '''
+    Objects:
+    1. check the validity
+    2. count total time width compare to t_ts
+    3. exclue inclue by con
+    '''
+    objlist_1 = dynamic.objlist_record
+    objlist_2 = dynamic.objlist_table
+
+    t_st = t_st * 3600  # hour -> second
+
+    for i in range(len(objlist_1)):
+
+        ob1, ob2 = objlist_1[i], objlist_2[i]
+        resp_l = ob1.objlist_resp.copy()
+        resp_t_l = [x.ts for x in resp_l]
+
+        if sum(resp_t_l) < t_st:
+            ob1, ob2 = None, None
+        else:
+            resp_t_l.reverse()
+            j = 1
+            while sum(resp_t_l[0:j]) <= t_st:
+                j += 1
+            ob1.objlist_resp = resp_l[-1 - j:-1]
+
+    dynamic.objlist_record = [i for i in objlist_1 if i]
+    dynamic.objlist_table = [i for i in objlist_2 if i]
 
 
 @basic.measure
@@ -297,24 +366,15 @@ def WaveformPlotting():
 
 
 def __MethodBasic(method, result, resp_list, method_sub=None):
-    if method_sub:
-        result.RR = method([x.RR for x in resp_list], method_sub)
-        result.V_T = method([x.V_T_i for x in resp_list], method_sub)
-        result.VE = method([x.VE for x in resp_list], method_sub)
-        result.wob = method([x.wob for x in resp_list], method_sub)
-        result.rsbi = method([x.rsbi for x in resp_list], method_sub)
-        result.mp_jm_d = method([x.mp_jm_d for x in resp_list], method_sub)
-        result.mp_jl_d = method([x.mp_jl_d for x in resp_list], method_sub)
-        result.mp_jm_t = method([x.mp_jm_t for x in resp_list], method_sub)
-        result.mp_jl_t = method([x.mp_jl_t for x in resp_list], method_sub)
-    else:
-        result.RR = method([x.RR for x in resp_list])
-        result.V_T = method([x.V_T_i for x in resp_list])
-        result.VE = method([x.VE for x in resp_list])
-        result.wob = method([x.wob for x in resp_list])
-        result.rsbi = method([x.rsbi for x in resp_list])
-        result.mp_jm = method([x.mp_jm for x in resp_list])
-        result.mp_jl = method([x.mp_jl for x in resp_list])
+    result.RR = method([x.RR for x in resp_list], method_sub)
+    result.V_T = method([x.V_T_i for x in resp_list], method_sub)
+    result.VE = method([x.VE for x in resp_list], method_sub)
+    result.wob = method([x.wob for x in resp_list], method_sub)
+    result.rsbi = method([x.rsbi for x in resp_list], method_sub)
+    result.mp_jm_d = method([x.mp_jm_d for x in resp_list], method_sub)
+    result.mp_jl_d = method([x.mp_jl_d for x in resp_list], method_sub)
+    result.mp_jm_t = method([x.mp_jm_t for x in resp_list], method_sub)
+    result.mp_jl_t = method([x.mp_jl_t for x in resp_list], method_sub)
 
 
 @basic.measure
@@ -325,9 +385,11 @@ def MethodTS():
     for record in objlist:
         record.obj_ts = domain1.DomainTS()
         record.obj_ts.ave = domain2.DomainTimeSeries()
+        record.obj_ts.med = domain2.DomainTimeSeries()
         record.obj_ts.std = domain2.DomainTimeSeries()
         record.obj_ts.cv = domain2.DomainTimeSeries()
         __MethodBasic(method, record.obj_ts.ave, record.objlist_resp, 'AVE')
+        __MethodBasic(method, record.obj_ts.med, record.objlist_resp, 'MED')
         __MethodBasic(method, record.obj_ts.std, record.objlist_resp, 'STD')
         __MethodBasic(method, record.obj_ts.cv, record.objlist_resp, 'CV')
 
@@ -373,6 +435,7 @@ def TimeAggregate():
         obj.pid = objlist_2[i].pid
         obj.end = objlist_2[i].end
         obj.ave = objlist_1[i].obj_ts.ave
+        obj.med = objlist_1[i].obj_ts.med
         obj.std = objlist_1[i].obj_ts.std
         obj.cv = objlist_1[i].obj_ts.cv
 
@@ -416,6 +479,16 @@ def TimeDomainTableBuild(form_name):
 
     df[colname['patient ID']] = [x.pid for x in result_list]
     df[colname['exTube end']] = [x.end for x in result_list]
+
+    df[colname['Median RR']] = [x.med.RR for x in result_list]
+    df[colname['Median V_T']] = [x.med.V_T for x in result_list]
+    df[colname['Median VE']] = [x.med.VE for x in result_list]
+    df[colname['Median WOB']] = [x.med.wob for x in result_list]
+    df[colname['Median RSBI']] = [x.med.rsbi for x in result_list]
+    df[colname['Median MP(Jm) d']] = [x.med.mp_jm_d for x in result_list]
+    df[colname['Median MP(JL) d']] = [x.med.mp_jl_d for x in result_list]
+    df[colname['Median MP(Jm) t']] = [x.med.mp_jm_t for x in result_list]
+    df[colname['Median MP(JL) t']] = [x.med.mp_jl_t for x in result_list]
 
     df[colname['Average RR']] = [x.ave.RR for x in result_list]
     df[colname['Average V_T']] = [x.ave.V_T for x in result_list]

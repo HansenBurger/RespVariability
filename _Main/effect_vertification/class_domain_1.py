@@ -6,6 +6,7 @@ class DomainBasic():
 class DomainResp(DomainBasic):
     def __init__(self):
         super().__init__()
+        self.__ts = 0
         self.__RR = 0
         self.__V_T_i = 0
         self.__V_T_e = 0
@@ -19,6 +20,14 @@ class DomainResp(DomainBasic):
         self.__mp_jm_t = 0
         self.__mp_jl_t = 0
         self.__rsbi = 0
+
+    @property
+    def ts(self):
+        return self.__ts
+
+    @ts.setter
+    def ts(self, v):
+        self.__ts = v
 
     @property
     def RR(self):
@@ -129,6 +138,7 @@ class DomainTS(DomainBasic):
     def __init__(self):
         super().__init__()
         self.__ave = None
+        self.__med = None
         self.__std = None
         self.__cv = None
 
@@ -139,6 +149,14 @@ class DomainTS(DomainBasic):
     @ave.setter
     def ave(self, obj):
         self.__ave = obj
+
+    @property
+    def med(self):
+        return self.__med
+
+    @med.setter
+    def med(self, obj):
+        self.__med = obj
 
     @property
     def std(self):

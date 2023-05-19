@@ -13,7 +13,7 @@ class DataStatic(DataBasic):
             },
             'data folder': {
                 'category': 'SampleDataRoute',
-                'name': 'FiltedData'
+                'name': 'WeanData'
             },
             'save_form': {
                 'category': 'ResultRoute',

@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import scipy
 import seaborn as sns
 from scipy import signal
 from datetime import datetime
@@ -20,16 +19,16 @@ data = Data()
 def TableBuild(pid):
     with sqlite3.connect(data.db_loc()) as con:
         df = pd.read_sql(data.pid_statement(pid), con)
-        FormProcess.TimeShift(df, data.table_info('time_col'))
-        data.df = df
 
+    df = df.rename(columns=data.table_info('col_map'))
+    FormProcess.TimeShift(df, data.table_info('time_col'))
     obj = class_domain_0.DomainTable()
     obj.pid = df['PID'].item()
-    obj.time = df['Resp_t'].item()
-    obj.rid = df['Record_id'].item()
-    obj.zdt = df['zdt_1'].item()
-    obj.zpx = df['zpx_1'].item()
-    obj.end = 0 if '成功' in df['endo_end'].item() else 1
+    obj.time = df['REC_t'].item()
+    obj.rid = df['RID'].item()
+    obj.zdt = df['zdt'].item()
+    obj.zpx = df['zpx'].item()
+    obj.end = 0 if '成功' in df['Extube_end'].item() else 1
     data.record_0 = obj
 
 
@@ -234,7 +233,7 @@ class FreqTransMethod():
         f_ind = f_ind[range(int(self.__n / 2))]
         f_out = f_out[range(int(self.__n / 2))]
 
-        df = pd.DataFrame({'freq': f_ind, 'range': f_out})[:300]
+        df = pd.DataFrame({'freq': f_ind, 'range': f_out})[:350]
         self.fft_si = df
 
     def PS_Si(self):
@@ -245,5 +244,5 @@ class FreqTransMethod():
             f_out = self.fft_si.range
             f_out = f_out**2
 
-            df = pd.DataFrame({'freq': f_ind, 'range': f_out})[:300]
+            df = pd.DataFrame({'freq': f_ind, 'range': f_out})[:350]
             self.ps_si = df

@@ -226,7 +226,9 @@ class DomainAggr_Time(DomainBasic):
         self.__pid = ''
         self.__end = 0
         self.__ave = None
+        self.__med = None
         self.__std = None
+        self.__cv = None
 
     @property
     def pid(self):
@@ -251,6 +253,14 @@ class DomainAggr_Time(DomainBasic):
     @ave.setter
     def ave(self, v):
         self.__ave = v
+
+    @property
+    def med(self):
+        return self.__med
+
+    @med.setter
+    def med(self, v):
+        self.__med = v
 
     @property
     def std(self):

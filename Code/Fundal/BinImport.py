@@ -283,7 +283,7 @@ def ImportZif(file_loc):
             try:
                 line = fp.readline().decode('gbk')  # transfer to string
 
-                if '}' in line:
+                if '}' in line and dict_tmp:
                     dict_list.append(dict_tmp)
                     dict_num = dict_num - 1
                     dict_tmp = {}

@@ -1,9 +1,10 @@
 import func
 
 
-def TableProcessing_RecordGeneration(switch=True):
-    func.SaveLocGenerate('effection_PSV_ICU4')
-    func.MainTableBuild() if switch else func.TestTableBuild()
+def TableProcessing_RecordGeneration():
+    func.SaveLocGenerate('weaning_PSV')
+    # func.MainTableBuild() if switch else func.TestTableBuild()
+    func.MainTableBuild_db('Records_half_h_PSV')
     func.GenerateObjList()
     func.GenerateFileLoc()
 
@@ -12,6 +13,7 @@ def RecordReading_RespCalculation():
     func.GetBinOutput()
     func.Calculate()
     func.RespValidity()
+    func.TimeScreening(0.5)
 
 
 def Linear_Analysis_Preservation():

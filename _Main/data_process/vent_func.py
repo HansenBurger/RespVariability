@@ -1,4 +1,7 @@
-import sys, pathlib
+import sys, pathlib, sqlite3
+from traceback import print_tb
+
+import pandas as pd
 import vent_class_data as data
 import vent_class_func as func
 from datetime import datetime
@@ -47,6 +50,38 @@ def MainTableBuild():
 
     dynamic.df_main = FormProcess.FormPreProcess(df_loc=table_loc)
     FormProcess.TimeShift(df=dynamic.df_main, column_names=static.time_col)
+
+
+@basic.measure
+def MainTableBuild_db(table_name):
+    db = r'C:\Main\Data\_\Database\sqlite\RespData_2201.db'
+    query_state = '''
+    SELECT * FROM {0}
+    '''.format(table_name)
+    with sqlite3.connect(db) as con:
+        df = pd.read_sql(query_state, con)
+    col_map = {
+        'PID': 'PID',
+        'ICU': 'ICU',
+        'RID': 'Record_id',
+        'REC_t': 'Resp_t',
+        'zdt': 'zdt_1',
+        'zpx': 'zpx_1',
+        'Extube_t': 'endo_t',
+        'Extube_end': 'endo_end',
+        'machine': 'machine',
+        'vent_t': 'vent_t',
+        'vent_m_0': 'vent_m_0',
+        'vent_m_1': 'vent_m_1',
+        'vent_m_2': 'vent_m_2',
+        'st_peep': 'st_peep',
+        'st_ps': 'st_ps',
+        'st_e_sens': 'st_e_sens',
+        'st_sumP': 'st_sumP'
+    }
+    df = df.rename(columns=col_map)
+    FormProcess.TimeShift(df, static.time_col)
+    dynamic.df_main = df
 
 
 @basic.measure
@@ -227,8 +262,8 @@ def __TableProcess_SumPMain(mode, hours):
     df_sumP = dynamic.df_s_para['ST_SUMP']
 
     process = func.TableQuery(df_record, [df_basic, df_vent, df_sumP])
-    process.TableFilt_PSV(df_vent.columns[:(hours * 2 + 1)])
-    process.TableFilt_SumP(df_sumP.columns[:(hours * 2 + 1)], mode)
+    process.TableFilt_PSV(df_vent.columns[:int(hours * 2 + 1)])
+    process.TableFilt_SumP(df_sumP.columns[:int(hours * 2 + 1)], mode)
     process.ConcatQueryByTime(colname['patient ID'], hours)
 
     return process.df
@@ -238,8 +273,9 @@ def __TableProcess_SumPMain(mode, hours):
 def TableProcess_SumP10(hour_set):
 
     filt_mode = 'sum_10'
-    form_save_name = static.save_table_name['result: 1h\'s sumP10+PSV filt']
+    form_save_name = 'Records_{0}h_sumP10_PSV'.format(hour_set)
     result_df = __TableProcess_SumPMain(filt_mode, hour_set)
+
     FormProcess.CsvToLocal(result_df, dynamic.save_form_loc, form_save_name)
 
 
@@ -247,7 +283,7 @@ def TableProcess_SumP10(hour_set):
 def TableProcess_SumP12(hour_set):
 
     filt_mode = 'sum_12'
-    form_save_name = static.save_table_name['result: 1h\'s sumP12+PSV filt']
+    form_save_name = 'Records_{0}h_sumP12_PSV'.format(hour_set)
     result_df = __TableProcess_SumPMain(filt_mode, hour_set)
     FormProcess.CsvToLocal(result_df, dynamic.save_form_loc, form_save_name)
 
@@ -258,10 +294,10 @@ def TableProcess_PSV(hour_set):
     df_record = dynamic.df_main
     df_basic = dynamic.df_basic
     df_vent = dynamic.df_s_para['ST_VM']
-    form_save_name = static.save_table_name['result: 1h\'s PSV filt']
+    form_save_name = 'Records_{0}h_PSV'.format(hour_set)
 
     process = func.TableQuery(df_record, [df_basic, df_vent])
-    process.TableFilt_PSV(df_vent.columns[:(hour_set * 2 + 1)])
+    process.TableFilt_PSV(df_vent.columns[:int(hour_set * 2 + 1)])
     process.ConcatQueryByTime(colname['patient ID'], hour_set)
     FormProcess.CsvToLocal(process.df, dynamic.save_form_loc, form_save_name)
 

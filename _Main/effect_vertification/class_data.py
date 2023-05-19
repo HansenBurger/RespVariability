@@ -14,7 +14,7 @@ class DataStatic(DataBasic):
             },
             'data folder': {
                 'category': 'SampleDataRoute',
-                'name': 'FiltedData'
+                'name': 'WeanData'
             },
             'save form': {
                 'category': 'ResultRoute',
@@ -61,6 +61,15 @@ class DataStatic(DataBasic):
             'CV MP(JL) d': 'MP_jl_3_d',
             'CV MP(Jm) t': 'MP_jm_3_t',
             'CV MP(JL) t': 'MP_jl_3_t',
+            'Median RR': 'RR_4',
+            'Median V_T': 'V_T_4',
+            'Median VE': 'VE_4',
+            'Median WOB': 'WOB_4',
+            'Median RSBI': 'RSBI_4',
+            'Median MP(Jm) d': 'MP_jm_4_d',
+            'Median MP(JL) d': 'MP_jl_4_d',
+            'Median MP(Jm) t': 'MP_jm_4_t',
+            'Median MP(JL) t': 'MP_jl_4_t',
             'Average RR': 'RR_1',
             'Average V_T': 'V_T_1',
             'Average VE': 'VE_1',
@@ -100,11 +109,11 @@ class DataStatic(DataBasic):
         }
 
         self.save_table_name = {
-            'result: linear PSV': 'Records_1h_PSV_linear',
-            'result: nonlinear PSV': 'Records_1h_PSV_nonlinear',
-            'result: linear sumP10': 'Records_1h_sumP10_PSV_linear',
-            'result: linear sumP12': 'Records_1h_sumP12_PSV_linear',
-            'result: nonlinear sumP12': 'Records_1h_sumP12_PSV_nonlinear'
+            'result: linear PSV': 'Records_halfh_PSV_linear',
+            'result: nonlinear PSV': 'Records_halfh_PSV_nonlinear',
+            'result: linear sumP10': 'Records_halfh_sumP10_PSV_linear',
+            'result: linear sumP12': 'Records_halfh_sumP12_PSV_linear',
+            'result: nonlinear sumP12': 'Records_halfh_sumP12_PSV_nonlinear'
         }
 
 

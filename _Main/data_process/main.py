@@ -44,11 +44,12 @@ def DataChecker():
             4. Save output to table and store
     '''
     func_2.SaveLocGenerate(DataChecker.__name__)
-    func_2.MainTableBuild()
+    #func_2.MainTableBuild()
+    func_2.MainTableBuild_db('RecordPreprocess', [1])
     func_2.GenerateObjList()
     func_2.GenerateFileLoc()
     func_2.GetBinOutput()
-    func_2.ResultGenerate()
+    # func_2.ResultGenerate()
     func_2.TableBuild()
     func_2.TableProcess()
 
@@ -66,19 +67,20 @@ def StProcessor():
             4. Save output to table and store
     '''
     func_3.SaveLocGenerate(StProcessor.__name__)
-    func_3.MainTableBuild()
+    # func_3.MainTableBuild()
+    func_3.MainTableBuild_db('Recordinfo_filted_with')
     func_3.TableRead_GP()
     func_3.RecordValidate_GP()
     func_3.CombineRecordsToPinfo()
     func_3.ResultBuild_PID()
     func_3.ResultBuild_VM()
-    func_3.ResultBuild_ST_PEEP()
-    func_3.ResultBuild_ST_PS()
+    # func_3.ResultBuild_ST_PEEP()
+    # func_3.ResultBuild_ST_PS()
     func_3.ResultBuild_ST_SUMP()
-    func_3.ResultBuild_ST_E_SENS()
-    func_3.TableProcess_PSV(1)
-    func_3.TableProcess_SumP10(1)
-    func_3.TableProcess_SumP12(1)
+    # func_3.ResultBuild_ST_E_SENS()
+    func_3.TableProcess_PSV(0.5)
+    func_3.TableProcess_SumP10(0.5)
+    func_3.TableProcess_SumP12(0.5)
     #func_3.TbaleProcess_PEEPInvalid()
 
 

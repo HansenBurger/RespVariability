@@ -62,10 +62,24 @@ def FreqGenerate(data, fs, plot_save):
 
 def main():
     save_main = r'C:\Users\HY_Burger\Desktop\Project\RespVariability\TestCode\freq test\fig'
-    ind, tar = WaveInfo_ReadCount(3782184)
+    ind, tar = WaveInfo_ReadCount(4694544)
     ts_data, Fs = FreqPreProcess(ind, tar, save_main)
     FreqGenerate(ts_data, Fs, save_main)
 
 
+def SigleCheck(pid):
+    func.TableBuild(pid)
+    func.BinaryRead()
+    func.Calculate()
+    outcome = func.Agger()
+    rsbi = outcome.rsbi
+    rsbi_ = func.np.sort(rsbi)
+    rr_ = outcome.rr
+    mid_ = round(func.np.median(rsbi), 2)
+    mean = round(func.np.mean(rsbi), 2)
+    pass
+
+
 if __name__ == '__main__':
     main()
+    # SigleCheck(241852)

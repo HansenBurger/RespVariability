@@ -1,7 +1,6 @@
 from pathlib import Path, PurePath
 import numpy as np
 import matplotlib.pyplot as plt
-from numpy.core.records import array
 import seaborn as sns
 
 
@@ -150,6 +149,11 @@ class Calculation(RecordFucBasic):
                 self.valid_tag = False
         else:
             self.valid_tag = False
+
+    def RespT(self, sample_rate):
+        vent_len = self.__end_ind - self.__pro_ind
+        resp_t = vent_len * 1 / sample_rate
+        return round(resp_t, 2)
 
     def RR(self, sample_rate):
         vent_len = self.__end_ind - self.__pro_ind
@@ -316,6 +320,10 @@ class Analysis(RecordFucBasic):
         if method_sub == 'CV':
             cv = np.std(array_) / np.mean(array_)
             return round(cv, 2)
+
+        if method_sub == 'MED':
+            med = np.median(array_)
+            return round(med, 2)
 
     def HRA(self, list_, method_sub):
         array_0 = np.array(list_[:len(list_) - 1])

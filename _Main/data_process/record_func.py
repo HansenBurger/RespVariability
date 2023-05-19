@@ -1,4 +1,6 @@
-import sys, pathlib
+import sys, pathlib, sqlite3
+from turtle import shape
+import pandas as pd
 import record_class_func as func
 import record_class_data as data
 from datetime import datetime
@@ -38,6 +40,34 @@ def MainTableBuild():
     dynamic.df = FormProcess.FormPreProcess(df_loc=table_loc)
 
     FormProcess.TimeShift(df=dynamic.df, column_names=static.time_col)
+
+
+@basic.measure
+def MainTableBuild_db(table_name, df_range):
+    db = r'C:\Main\Data\_\Database\sqlite\RespdataWean_2203.db'
+    query_state = '''
+    SELECT * FROM {0}
+    '''.format(table_name)
+    with sqlite3.connect(db) as con:
+        df = pd.read_sql(query_state, con)
+    col_map = {
+        'PID': 'PID',
+        'ICU': 'ICU',
+        'RID': 'Record_id',
+        'REC_t': 'Resp_t',
+        'zdt': 'zdt_1',
+        'zpx': 'zpx_1',
+        'Extube_t': 'endo_t',
+        'Extube_end': 'endo_end',
+    }
+    df = df.rename(columns=col_map)
+    FormProcess.TimeShift(df, static.time_col)
+    if len(df_range) > 1:
+        dynamic.df = df.iloc[(df_range[0] - 1):(df_range[1] - 1)]
+    else:
+        dynamic.df = df.iloc[(df_range[0] - 1):]
+    a = dynamic.df
+    pass
 
 
 def TestTableBuild():
@@ -91,6 +121,7 @@ def GetBinOutput():
 
         ob0 = objlist_0[i]
         ob1 = objlist_1[i]
+        ob2 = data.DomainResult()
 
         process = func.OutputCheck(ob1)
         zif_output = process.ZifContentCheck(BinImport.ImportZif)
@@ -123,10 +154,24 @@ def GetBinOutput():
 
         ob1.mand_type = zpx_output[para['mand type']] if zpx_output else []
 
+        process = func.Calculation(ob1, ob2)
+        process.FlowtimeBuild()
+        process.VMlistBuild(ReadSamplerate.ReadVentMode)
+
+        ob2.peep_list = process.SetsBuild(ob1.st_peep)
+
+        ob2.ps_list = process.SetsBuild(ob1.st_ps)
+
+        ob2.e_sens_list = process.SetsBuild(ob1.st_e_sens)
+
+        ob2.sumP_list = process.SetSum(ob2.peep_list, ob2.ps_list)
+
+        dynamic.objlist_result.append(ob2)
+
         end_time = datetime.now()
 
         print('process the {0} row consume {1} s'.format(
-            str(ob0.row).rjust(4, '0'), (end_time - start_time).seconds))
+            str(ob0.row + 1).rjust(4, '0'), (end_time - start_time).seconds))
 
 
 @basic.measure
@@ -188,6 +233,6 @@ def TableProcess():
     filt_machine_840_1 = df[colname['machine type']].str.contains('840-22')
     filt_ICU4 = df[colname['ICU']] == 'ICU4F'
 
-    df = df[~filt_machine_840_0 & ~filt_machine_840_1 & ~filt_ICU4]
+    df = df[~filt_machine_840_0 & ~filt_machine_840_1]
 
     FormProcess.CsvToLocal(df, dynamic.save_loc, save_form_loc)

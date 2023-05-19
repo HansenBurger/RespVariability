@@ -1,5 +1,6 @@
 from Code.Fundal import BinImport as BI
 from Code.Fundal import ReadSamplerate as RS
+from struct import unpack
 import numpy as np
 
 
@@ -26,9 +27,21 @@ def PointProcessing(zdt_loc):
         machine_type = wave_header["Reserved1"][0].item()
         ref_sample_rate = RS.ReadSamplerate(machine_type)
 
-    with open(zdt_loc, "rb") as fid:
-        fid.seek(head_size)
-        data_info = np.fromfile(fid, np.uint16).tolist()
+    try:
+        with open(zdt_loc, "rb") as fid:
+            fid.seek(head_size)
+            data_info = np.fromfile(fid, np.uint16).tolist()
+            data_info = np.array(data_info)
+    except:
+        data_info = []
+        with open(zdt_loc, 'rb') as f:
+            f.seek(head_size)
+            byte = f.read(2)
+            data_info.append(byte)
+            while byte:
+                byte = f.read(2)
+                data_info.append(byte)
+        data_info = [unpack('H', x)[0] for x in data_info[:-1]]
         data_info = np.array(data_info)
 
     if len(data_info) % channel_cnt != 0:
@@ -45,7 +58,7 @@ def PointProcessing(zdt_loc):
         P = wave_data[1]
         V = []
 
-    elif channel_cnt == 3:
+    elif channel_cnt == 3 or channel_cnt == 5:
         F = wave_data[0]
         P = wave_data[1]
         V = wave_data[2]

@@ -252,6 +252,7 @@ class TableQuery(FuncBasic):
         for pid in self.__df2[col_pid].unique().tolist():
             df_tmp = gp.get_group(pid)
             if hour_set:
+                hour_set = 1 if hour_set <= 1 else hour_set
                 df_tmp_ = df_tmp.iloc[::-1][:hour_set]
                 if not df_tmp_.empty and df_tmp_.shape[0] == hour_set:
                     self.df = pd.concat([self.df, df_tmp_],
@@ -263,3 +264,10 @@ class TableQuery(FuncBasic):
                                     ignore_index=True)
 
         self.df = self.df.reset_index(drop=True)
+
+
+class TableInfoOut(FuncBasic):
+    def __init__(self, txt) -> None:
+        super().__init__()
+
+    pass

@@ -13,7 +13,7 @@ class Data(basic):
 
     def pid_statement(self, pid):
         statement = '''
-        SELECT * FROM Records_1h_sumP12_PSV
+        SELECT * FROM Records_half_h_PSV
         WHERE PID={0}
         '''.format(pid)
         return statement
@@ -23,11 +23,32 @@ class Data(basic):
         return loc
 
     def db_loc(self):
-        loc = r'C:\Main\Data\_\Database\sqlite\RespData.db'
+        loc = r'C:\Main\Data\_\Database\sqlite\RespData_2201.db'
         return loc
 
     def table_info(self, type):
-        dict_ = {'time_col': ['Resp_t', 'endo_t', 'SBT_time']}
+        dict_ = {
+            'time_col': ['REC_t', 'Extube_t', 'SBT_time'],
+            'col_map': {
+                'PID': 'PID',
+                'ICU': 'ICU',
+                'Record_id': 'RID',
+                'Resp_t': 'REC_t',
+                'zdt_1': 'zdt',
+                'zpx_1': 'zpx',
+                'endo_t': 'Extube_t',
+                'endo_end': 'Extube_end',
+                'machine': 'machine',
+                'vent_t': 'vent_t',
+                'vent_m_0': 'vent_m_0',
+                'vent_m_1': 'vent_m_1',
+                'vent_m_2': 'vent_m_2',
+                'st_peep': 'st_peep',
+                'st_ps': 'st_ps',
+                'st_e_sens': 'st_e_sens',
+                'st_sumP': 'st_sumP'
+            }
+        }
         return dict_[type]
 
     @property
